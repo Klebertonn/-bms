@@ -1,0 +1,19 @@
+#pragma once
+
+enum class BLECommand
+{
+    NONE,
+
+    READ_STATUS,
+    READ_CELLS,
+    READ_TEMPERATURES,
+    READ_SOC,
+    READ_EVENTS,
+
+    START_BALANCING,
+    STOP_BALANCING,
+
+    SAVE_CONFIGURATION,
+    REBOOT
+};
+
