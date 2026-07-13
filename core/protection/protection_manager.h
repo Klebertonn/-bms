@@ -8,7 +8,7 @@ class ProtectionManager
 public:
     void init();
 
-    void update(const PackData& pack);
+    void update(const BatteryPack& pack);
 
     ProtectionState getState() const;
 
@@ -24,10 +24,12 @@ private:
     bool chargeMosfet = true;
     bool dischargeMosfet = true;
 
-    void checkVoltage(const PackData& pack);
-    void checkTemperature(const PackData& pack);
-    void checkCurrent(const PackData& pack);
+    void checkVoltage(const BatteryPack& pack);
+    void checkTemperature(const BatteryPack& pack);
+    void checkCurrent(const BatteryPack& pack);
 
     void applyProtection();
 };
+
+
 

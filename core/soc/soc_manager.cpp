@@ -37,10 +37,11 @@ float SOCManager::clampPercent(float x) const
     return x;
 }
 
-void SOCManager::update(const PackData& pack,
+void SOCManager::update(const BatteryPack& pack,
                           float dtSeconds)
 {
     counter.update(pack.current, dtSeconds);
+
 
     // Mantém energia/ciclos sempre atualizados
     calculateSOC(pack);
@@ -65,8 +66,9 @@ SOCData SOCManager::getData() const
     return data;
 }
 
-void SOCManager::calculateSOC(const PackData& pack)
+void SOCManager::calculateSOC(const BatteryPack& pack)
 {
+
     float voltageEstimate = (pack.totalVoltage / NOMINAL_PACK_VOLTAGE) * 100.0f;
 
     float coulombEstimate =
@@ -84,8 +86,9 @@ void SOCManager::calculateSOH()
     data.soh = clampPercent(data.soh);
 }
 
-void SOCManager::calculateEnergy(const PackData& pack)
+void SOCManager::calculateEnergy(const BatteryPack& pack)
 {
+
     data.energyRemainingWh = pack.totalVoltage * data.remainingCapacityAh;
     data.energyConsumedWh = counter.getConsumedAh() * pack.totalVoltage;
 }

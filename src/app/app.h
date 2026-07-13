@@ -24,6 +24,8 @@ public:
 
 private:
 
+    void printTelemetry(const BatteryPack& pack);
+
     Logger logger_{};
 
 

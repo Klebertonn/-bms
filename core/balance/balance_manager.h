@@ -20,7 +20,7 @@ class BalanceManager
 public:
     void init();
 
-    void update(const PackData& pack,
+    void update(const BatteryPack& pack,
                 const ProtectionManager& protection,
                 const BatteryManager& battery);
 
@@ -33,7 +33,9 @@ private:
 
     void selectCell(const BatteryManager& battery);
 
-    bool canBalance(const PackData& pack,
+    bool canBalance(const BatteryPack& pack,
                     const ProtectionManager& protection);
 };
+
+
 

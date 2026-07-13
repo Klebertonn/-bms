@@ -10,7 +10,7 @@ class SOCManager
 public:
     void init();
 
-    void update(const PackData& pack,
+    void update(const BatteryPack& pack,
                 float deltaTimeSeconds);
 
     SOCData getData() const;
@@ -20,12 +20,14 @@ private:
     CoulombCounter counter;
 
     // Estimações
-    void calculateSOC(const PackData& pack);
+    void calculateSOC(const BatteryPack& pack);
     void calculateSOH();
     void calculateCycles();
-    void calculateEnergy(const PackData& pack);
+    void calculateEnergy(const BatteryPack& pack);
 
     // Utilitários
     float clampPercent(float x) const;
 };
+
+
 

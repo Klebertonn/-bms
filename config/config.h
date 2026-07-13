@@ -1,49 +1,88 @@
 #pragma once
 
-// Limites iniciais (stubs). Ajustar conforme características do pack.
+#include <cstdint>
 
-// Tensões por célula
-#ifndef MAX_CELL_VOLTAGE
-#define MAX_CELL_VOLTAGE 4.20f
-#endif
+/*
+ * ==========================================================
+ * Configuração Geral do Pack
+ * ==========================================================
+ */
 
-#ifndef MIN_CELL_VOLTAGE
-#define MIN_CELL_VOLTAGE 3.00f
-#endif
-
-// Temperatura (°C)
-#ifndef MAX_TEMPERATURE
-#define MAX_TEMPERATURE 60.0f
-#endif
-
-#ifndef MIN_TEMPERATURE
-#define MIN_TEMPERATURE -20.0f
-#endif
-
-// Corrente (A)
-#ifndef MAX_CHARGE_CURRENT
-#define MAX_CHARGE_CURRENT 30.0f
-#endif
-
-#ifndef MAX_DISCHARGE_CURRENT
-#define MAX_DISCHARGE_CURRENT 30.0f
-#endif
-
-// Balanceamento (stubs)
-#ifndef BALANCE_START_DELTA
-#define BALANCE_START_DELTA 0.020f
-#endif
-
-#ifndef BALANCE_STOP_DELTA
-#define BALANCE_STOP_DELTA 0.010f
-#endif
-
-#ifndef MAX_BALANCE_TEMP
-#define MAX_BALANCE_TEMP 45.0f
-#endif
-
-#ifndef MAX_BALANCE_TIME_MS
-#define MAX_BALANCE_TIME_MS 600000
-#endif
+// Número de células em série
+constexpr std::uint8_t PACK_CELL_COUNT = 3;
 
 
+/*
+ * ==========================================================
+ * Limites de Tensão por Célula (V)
+ * ==========================================================
+ */
+
+constexpr float MAX_CELL_VOLTAGE = 4.20f;
+constexpr float MIN_CELL_VOLTAGE = 3.00f;
+
+// Validação/saúde por célula (Passo 1.2)
+#define CELL_OVERVOLTAGE_LIMIT   4.25f
+#define CELL_UNDERVOLTAGE_LIMIT  3.00f
+
+
+constexpr float CELL_NOMINAL_VOLTAGE = 3.70f;
+
+
+/*
+ * ==========================================================
+ * Limites de Temperatura (°C)
+ * ==========================================================
+ */
+
+constexpr float MAX_TEMPERATURE = 60.0f;
+constexpr float MIN_TEMPERATURE = -20.0f;
+
+constexpr float MAX_BALANCE_TEMP = 45.0f;
+
+
+/*
+ * ==========================================================
+ * Limites de Corrente (A)
+ * ==========================================================
+ */
+
+constexpr float MAX_CHARGE_CURRENT = 30.0f;
+constexpr float MAX_DISCHARGE_CURRENT = 30.0f;
+
+
+/*
+ * ==========================================================
+ * Balanceamento
+ * ==========================================================
+ */
+
+// Inicia balanceamento quando ΔV ≥ 20 mV
+constexpr float BALANCE_START_DELTA = 0.020f;
+
+// Para balanceamento quando ΔV ≤ 10 mV
+constexpr float BALANCE_STOP_DELTA = 0.010f;
+
+// Tempo máximo de balanceamento
+constexpr std::uint32_t MAX_BALANCE_TIME_MS = 600000;
+
+
+/*
+ * ==========================================================
+ * Atualização do Sistema
+ * ==========================================================
+ */
+
+constexpr std::uint32_t MAIN_LOOP_PERIOD_MS = 100;
+constexpr std::uint32_t LOGGER_PERIOD_MS = 1000;
+constexpr std::uint32_t TELEMETRY_PERIOD_MS = 500;
+
+
+/*
+ * ==========================================================
+ * SOC
+ * ==========================================================
+ */
+
+constexpr float PACK_FULL_VOLTAGE = 12.60f;
+constexpr float PACK_EMPTY_VOLTAGE = 9.00f;

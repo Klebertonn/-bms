@@ -2,6 +2,7 @@
 
 #include "../../config/config.h"
 
+
 // Limites (stubs) caso ainda não estejam definidos na config.
 #ifndef BALANCE_START_DELTA
 #define BALANCE_START_DELTA 0.020f
@@ -30,13 +31,13 @@ BalanceInfo BalanceManager::getStatus() const
     return info;
 }
 
-bool BalanceManager::canBalance(const PackData& pack,
+bool BalanceManager::canBalance(const BatteryPack& pack,
                                 const ProtectionManager& protection)
 {
     if (protection.isFault())
         return false;
 
-    if (pack.temperature > MAX_BALANCE_TEMP)
+    if (pack.maxTemperature > MAX_BALANCE_TEMP)
         return false;
 
     // Gate simples baseado na variação de tensão entre células
@@ -45,6 +46,7 @@ bool BalanceManager::canBalance(const PackData& pack,
 
     return true;
 }
+
 
 void BalanceManager::selectCell(const BatteryManager& battery)
 {
@@ -71,11 +73,12 @@ void BalanceManager::selectCell(const BatteryManager& battery)
     }
 }
 
-void BalanceManager::update(const PackData& pack,
+void BalanceManager::update(const BatteryPack& pack,
                              const ProtectionManager& protection,
                              const BatteryManager& battery)
 {
     info.deltaVoltage = pack.deltaVoltage;
+
 
     if (!canBalance(pack, protection))
     {

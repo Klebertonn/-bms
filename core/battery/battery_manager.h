@@ -6,21 +6,7 @@
 #define BMS_MAX_CELLS 16
 #endif
 
-/// Dados de uma célula
-struct CellData {
-    float voltage; // [V]
-};
-
-/// Dados agregados do pack
-struct PackData {
-    float totalVoltage;   // [V]
-    float minVoltage;     // [V]
-    float maxVoltage;     // [V]
-    float deltaVoltage;   // [V]
-    float current;        // [A] (placeholder inicialmente)
-    float temperature;    // [°C] (placeholder inicialmente)
-    uint8_t soc;           // [%]
-};
+#include "battery_pack.h"
 
 /**
  * @brief BatteryManager (CORE)
@@ -43,13 +29,29 @@ public:
     void update();
 
     float getCellVoltage(int index) const;
-    PackData getPackData() const;
+
+    BatteryPack& getPack();
+    const BatteryPack& getPack() const;
+
+    // Domínio: App apenas fornece entradas; BatteryManager monta/atualiza o BatteryPack.
+    void setCurrent(float current);
+    void setTemperatures(float averageTemperature, float minTemperature, float maxTemperature);
+    void setTemperature(float temperature); // compat (mapeia para average)
+    void setSOC(uint8_t soc);
+    void setSOH(uint8_t soh);
+
+    void setCharging(bool enabled);
+    void setDischarging(bool enabled);
 
 private:
-    CellData cells[BMS_MAX_CELLS]{};
-    PackData pack{};
+    BatteryPack pack{};
+
+    void validateCells();
 
     void calculatePack();
     void calculateSOC();
 };
+
+
+
 

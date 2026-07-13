@@ -39,6 +39,42 @@ static const char* protectionStateToString(ProtectionState state)
     }
 }
 
+void App::printTelemetry(const BatteryPack& pack)
+{
+    printf("\n");
+    printf("=============== BMS TELEMETRY ===============\n");
+
+    printf("PACK       : %.2f V\n", pack.totalVoltage);
+    printf("AVG CELL   : %.3f V\n", pack.averageVoltage);
+    printf("MIN CELL   : %.3f V\n", pack.minVoltage);
+    printf("MAX CELL   : %.3f V\n", pack.maxVoltage);
+    printf("DELTA      : %.0f mV\n", pack.deltaVoltage * 1000.0f);
+
+    printf("\n");
+
+    printf("CURRENT    : %.2f A\n", pack.current);
+    printf("POWER      : %.2f W\n", pack.power);
+
+    printf("\n");
+
+    printf("TEMP       : %.1f °C\n", pack.averageTemperature);
+
+    printf("\n");
+
+    printf("SOC        : %u %%\n", pack.soc);
+    printf("SOH        : %u %%\n", pack.soh);
+
+    printf("\n");
+
+    printf("CHARGING   : %s\n", pack.charging ? "YES" : "NO");
+    printf("DISCHARGE  : %s\n", pack.discharging ? "YES" : "NO");
+    printf("BALANCING  : %s\n", pack.balancing ? "ON" : "OFF");
+
+    printf("\n");
+
+    printf("=============================================\n\n");
+}
+
 bool App::init()
 {
     logger_.init();
@@ -103,7 +139,8 @@ void App::update()
 
     battery_.update();
 
-    PackData pack = battery_.getPackData();
+    BatteryPack& pack = battery_.getPack();
+
 
     //-------------------------------------------------
     // Current
@@ -111,9 +148,15 @@ void App::update()
 
     current_.update(pack.totalVoltage);
 
+
     CurrentData currentData = current_.getData();
 
+    battery_.setCurrent(currentData.currentA);
+    // Mantém potência do pack consistente com a corrente atual.
     pack.current = currentData.currentA;
+    pack.power = pack.totalVoltage * pack.current;
+
+
 
     //-------------------------------------------------
     // Temperature
@@ -123,7 +166,15 @@ void App::update()
 
     TemperatureData temperatureData = temperature_.getData();
 
-    pack.temperature = temperatureData.maxTemperature;
+    // Atualiza temperaturas no estado compartilhado do BatteryPack
+    // Temporariamente, caso ainda não exista temperatura média real no TemperatureData,
+    // copiamos maxTemperature para todos os campos.
+    pack.averageTemperature = temperatureData.averageTemperature;
+    pack.maxTemperature = temperatureData.maxTemperature;
+    pack.minTemperature = temperatureData.minTemperature;
+
+
+
 
     //-------------------------------------------------
     // Protection
@@ -145,25 +196,19 @@ void App::update()
     // Telemetria
     //-------------------------------------------------
 
-    char telemetry[200];
 
-    snprintf(
-        telemetry,
-        sizeof(telemetry),
-        "PACK %.2fV | MIN %.2fV | MAX %.2fV | CURRENT %.2fA | TEMP %.2fC | SOC %d%%",
-        pack.totalVoltage,
-        pack.minVoltage,
-        pack.maxVoltage,
-        pack.current,
-        pack.temperature,
-        pack.soc
-    );
 
-    logger_.info(
-        EventSource::SYSTEM,
-        7000,
-        telemetry
-    );
+    // Estados do sistema devem refletir o que os MOSFETs/flags realmente permitem.
+    // Atualiza após protection_.update(pack);
+    pack.charging = protection_.chargeEnabled();
+    pack.discharging = protection_.dischargeEnabled();
+
+    // Temporariamente, até BalanceManager expor isBalancing.
+    pack.balancing = false;
+
+
+    printTelemetry(pack);
+
 
     //-------------------------------------------------
     // Proteção

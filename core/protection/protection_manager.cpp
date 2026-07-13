@@ -33,7 +33,7 @@ void ProtectionManager::init()
     dischargeMosfet = true;
 }
 
-void ProtectionManager::update(const PackData& pack)
+void ProtectionManager::update(const BatteryPack& pack)
 {
     state = ProtectionState::NORMAL;
 
@@ -43,6 +43,8 @@ void ProtectionManager::update(const PackData& pack)
 
     applyProtection();
 }
+
+
 
 ProtectionState ProtectionManager::getState() const
 {
@@ -64,9 +66,10 @@ bool ProtectionManager::isFault() const
     return state != ProtectionState::NORMAL;
 }
 
-void ProtectionManager::checkVoltage(const PackData& pack)
+void ProtectionManager::checkVoltage(const BatteryPack& pack)
 {
     if (pack.maxVoltage > MAX_CELL_VOLTAGE)
+
     {
         state = ProtectionState::OVER_VOLTAGE;
 
@@ -83,20 +86,23 @@ void ProtectionManager::checkVoltage(const PackData& pack)
     }
 }
 
-void ProtectionManager::checkTemperature(const PackData& pack)
+void ProtectionManager::checkTemperature(const BatteryPack& pack)
 {
+
     if (state != ProtectionState::NORMAL)
         return;
 
-    if (pack.temperature > MAX_TEMPERATURE)
+    if (pack.maxTemperature > MAX_TEMPERATURE)
     {
         state = ProtectionState::OVER_TEMPERATURE;
+
 
         // Logger::warning("OTP detected");
         return;
     }
 
-    if (pack.temperature < MIN_TEMPERATURE)
+    if (pack.minTemperature < MIN_TEMPERATURE)
+
     {
         state = ProtectionState::UNDER_TEMPERATURE;
 
@@ -104,12 +110,13 @@ void ProtectionManager::checkTemperature(const PackData& pack)
     }
 }
 
-void ProtectionManager::checkCurrent(const PackData& pack)
+void ProtectionManager::checkCurrent(const BatteryPack& pack)
 {
     if (state != ProtectionState::NORMAL)
         return;
 
     if (pack.current > MAX_CHARGE_CURRENT)
+
     {
         state = ProtectionState::OVER_CURRENT_CHARGE;
 

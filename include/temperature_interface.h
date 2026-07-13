@@ -1,10 +1,12 @@
 #pragma once
 
+#include <cstdint>
+
 class ITemperatureSensor
 {
 public:
-
     virtual ~ITemperatureSensor() = default;
 
-    virtual float readTemperatureC() = 0;
+    // Lê a temperatura do sensor informado
+    virtual float readTemperatureC(std::uint8_t sensor) = 0;
 };
