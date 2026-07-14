@@ -8,6 +8,8 @@
 #include "../../core/balance/balance_manager.h"
 #include "../../core/fault/fault_manager.h"
 #include "../../core/state/bms_state_manager.h"
+#include "../../core/mosfet/mosfet_controller.h"
+
 
 
 
@@ -52,6 +54,9 @@ private:
     BmsStateManager stateManager_{};
 
     BalanceManager balance_{};
+
+    MosfetController mosfet_{};
 };
+
 
 

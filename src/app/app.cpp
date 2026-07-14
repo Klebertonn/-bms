@@ -194,17 +194,19 @@ void App::update()
 
     stateManager_.update(pack, fault_);
 
-    // Estados do sistema devem refletir o que os MOSFETs/flags realmente permitem.
-    // Atualiza após protection_.update(pack);
-    pack.charging = protection_.chargeEnabled();
-    pack.discharging = protection_.dischargeEnabled();
+    // MOSFET é uma ação derivada do estado: State → MOSFET → Telemetria
+    mosfet_.applyState(stateManager_.getState());
 
-    // Temporariamente, até BalanceManager expor isBalancing.
-    pack.balancing = false;
+    // Telemetria lê o estado real dos MOSFETs
+    pack.charging = mosfet_.chargeEnabled();
+    pack.discharging = mosfet_.dischargeEnabled();
+    pack.balancing = mosfet_.balanceEnabled();
+
+
 
     //-------------------------------------------------
 
-    // Balance
+    // Balance (futuro: integrar ao MosfetController)
     //-------------------------------------------------
 
     balance_.update(
@@ -213,16 +215,13 @@ void App::update()
         battery_
     );
 
-    // Estados do sistema devem refletir o que os MOSFETs/flags realmente permitem.
-    // Atualiza após protection_.update(pack) e após balance_.update(pack).
-    pack.charging = protection_.chargeEnabled();
-    pack.discharging = protection_.dischargeEnabled();
+    // Para o v1.0 industrial, a camada de MosfetController é a fonte de verdade.
+    // ProtectionManager continua existindo para gerar falhas e flags, mas não sobrescreve MOSFETs.
 
-    // Temporariamente, até BalanceManager expor isBalancing.
-    // (A state machine usa pack.balancing para decidir BALANCING.)
-    pack.balancing = false;
+    (void)balance_.getStatus();
 
     printTelemetry(pack);
+
 
 
 
