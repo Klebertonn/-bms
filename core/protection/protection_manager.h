@@ -1,14 +1,18 @@
 #pragma once
 
 #include "../battery/battery_manager.h"
+#include "../fault/fault_manager.h"
 #include "protection_types.h"
+
 
 class ProtectionManager
 {
 public:
     void init();
 
-    void update(const BatteryPack& pack);
+    void update(const BatteryPack& pack,
+                const FaultManager& faults);
+
 
     ProtectionState getState() const;
 

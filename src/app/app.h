@@ -6,9 +6,15 @@
 #include "../../core/temperature/temperature_manager.h"
 #include "../../core/protection/protection_manager.h"
 #include "../../core/balance/balance_manager.h"
+#include "../../core/fault/fault_manager.h"
+#include "../../core/state/bms_state_manager.h"
+
+
 
 
 #include "../../system/logger/logger.h"
+
+
 
 
 
@@ -41,5 +47,11 @@ private:
     ProtectionManager protection_{};
 
 
+    FaultManager fault_{};
+
+    BmsStateManager stateManager_{};
+
     BalanceManager balance_{};
 };
+
+

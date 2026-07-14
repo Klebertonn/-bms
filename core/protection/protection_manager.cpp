@@ -33,16 +33,54 @@ void ProtectionManager::init()
     dischargeMosfet = true;
 }
 
-void ProtectionManager::update(const BatteryPack& pack)
+void ProtectionManager::update(
+    const BatteryPack& pack,
+    const FaultManager& faults
+)
 {
+    (void)pack;
+
+    // Estado padrão
+    chargeMosfet = true;
+    dischargeMosfet = true;
     state = ProtectionState::NORMAL;
 
-    checkVoltage(pack);
-    checkTemperature(pack);
-    checkCurrent(pack);
+    // Interpretação por falha (prioridade: primeira que casar)
+    if (faults.hasFault(FAULT_CELL_OVERVOLTAGE))
+    {
+        state = ProtectionState::OVER_VOLTAGE;
+        chargeMosfet = false;
+        dischargeMosfet = true;
+        return;
+    }
 
-    applyProtection();
+    if (faults.hasFault(FAULT_CELL_UNDERVOLTAGE))
+    {
+        state = ProtectionState::UNDER_VOLTAGE;
+        chargeMosfet = true;
+        dischargeMosfet = false;
+        return;
+    }
+
+    if (faults.hasFault(FAULT_OVER_TEMPERATURE))
+    {
+        state = ProtectionState::OVER_TEMPERATURE;
+        chargeMosfet = false;
+        dischargeMosfet = false;
+        return;
+    }
+
+    if (faults.hasFault(FAULT_OVER_CURRENT))
+    {
+        state = ProtectionState::OVER_CURRENT_DISCHARGE;
+        chargeMosfet = false;
+        dischargeMosfet = false;
+        return;
+    }
+
 }
+
+
 
 
 

@@ -1,3 +1,4 @@
+
 #include "app.h"
 
 #include <cstdio>
@@ -80,10 +81,12 @@ bool App::init()
     logger_.init();
 
     logger_.info(
+
         EventSource::SYSTEM,
         1000,
         "Application Started"
     );
+
 
     battery_.init();
 
@@ -177,26 +180,19 @@ void App::update()
 
 
     //-------------------------------------------------
-    // Protection
+    // Fault / Protection
     //-------------------------------------------------
 
-    protection_.update(pack);
+    fault_.evaluate(pack);
+
+    protection_.update(pack, fault_);
 
     //-------------------------------------------------
-    // Balance
+
+    // BMS State
     //-------------------------------------------------
 
-    balance_.update(
-        pack,
-        protection_,
-        battery_
-    );
-
-    //-------------------------------------------------
-    // Telemetria
-    //-------------------------------------------------
-
-
+    stateManager_.update(pack, fault_);
 
     // Estados do sistema devem refletir o que os MOSFETs/flags realmente permitem.
     // Atualiza após protection_.update(pack);
@@ -206,8 +202,28 @@ void App::update()
     // Temporariamente, até BalanceManager expor isBalancing.
     pack.balancing = false;
 
+    //-------------------------------------------------
+
+    // Balance
+    //-------------------------------------------------
+
+    balance_.update(
+        pack,
+        protection_,
+        battery_
+    );
+
+    // Estados do sistema devem refletir o que os MOSFETs/flags realmente permitem.
+    // Atualiza após protection_.update(pack) e após balance_.update(pack).
+    pack.charging = protection_.chargeEnabled();
+    pack.discharging = protection_.dischargeEnabled();
+
+    // Temporariamente, até BalanceManager expor isBalancing.
+    // (A state machine usa pack.balancing para decidir BALANCING.)
+    pack.balancing = false;
 
     printTelemetry(pack);
+
 
 
     //-------------------------------------------------
@@ -215,6 +231,44 @@ void App::update()
     //-------------------------------------------------
 
     char protectionLog[200];
+
+    // Log do State Machine (BMS)
+    const char* bmsStateStr = "IDLE";
+
+    switch (stateManager_.getState())
+    {
+        case BmsState::INIT:
+            bmsStateStr = "INIT";
+            break;
+        case BmsState::IDLE:
+            bmsStateStr = "IDLE";
+            break;
+        case BmsState::CHARGING:
+            bmsStateStr = "CHARGING";
+            break;
+        case BmsState::DISCHARGING:
+            bmsStateStr = "DISCHARGING";
+            break;
+        case BmsState::BALANCING:
+            bmsStateStr = "BALANCING";
+            break;
+        case BmsState::FAULT:
+            bmsStateStr = "FAULT";
+            break;
+        case BmsState::SHUTDOWN:
+            bmsStateStr = "SHUTDOWN";
+            break;
+        default:
+            bmsStateStr = "IDLE";
+            break;
+    }
+
+    logger_.info(
+        EventSource::SYSTEM,
+        6001,
+        bmsStateStr
+    );
+
 
     snprintf(
         protectionLog,
