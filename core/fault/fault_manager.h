@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fault_flags.h"
+#include "fault_reason.h"
 #include "../battery/battery_pack.h"
 
 class FaultManager
@@ -20,9 +21,15 @@ public:
 
     uint32_t getFaults() const;
 
+    // Novo: detalhe industrial da falha.
+    const FaultInfo& getFaultInfo() const { return faultInfo_; }
+
 private:
     uint32_t flags = FAULT_NONE;
+    FaultInfo faultInfo_{};
 };
+
+
 
 
 

@@ -9,12 +9,10 @@
 #include "../../core/fault/fault_manager.h"
 #include "../../core/state/bms_state_manager.h"
 #include "../../core/mosfet/mosfet_controller.h"
-
-
-
-
+#include "../../core/fault/fault_history.h"
 
 #include "../../system/logger/logger.h"
+
 
 
 
@@ -33,8 +31,9 @@ public:
 private:
 
     void printTelemetry(const BatteryPack& pack);
+    void printFaultHistory();
 
-    Logger logger_{};
+
 
 
     BatteryManager battery_{};
@@ -56,7 +55,16 @@ private:
     BalanceManager balance_{};
 
     MosfetController mosfet_{};
+
+    FaultHistory faultHistory_{};
+
+    // last pushed fault snapshot (avoid repeating the same event)
+    bool lastFaultActive_ = false;
+    FaultReason lastFaultReason_ = FaultReason::NONE;
+    std::uint16_t lastFaultCode_ = 0;
+    std::uint8_t lastFaultSource_ = 0xFF;
 };
+
 
 
 

@@ -1,6 +1,7 @@
 
 #include "app.h"
 
+#include "../../system/clock/clock.h"
 #include <cstdio>
 
 static const char* protectionStateToString(ProtectionState state)
@@ -78,60 +79,36 @@ void App::printTelemetry(const BatteryPack& pack)
 
 bool App::init()
 {
-    logger_.init();
-
-    logger_.info(
-
-        EventSource::SYSTEM,
-        1000,
-        "Application Started"
-    );
-
-
     battery_.init();
-
-    logger_.info(
-        EventSource::BATTERY,
-        3000,
-        "Battery Manager Ready"
-    );
-
     protection_.init();
-
-    logger_.info(
-        EventSource::PROTECTION,
-        2000,
-        "Protection Manager Ready"
-    );
-
     balance_.init();
-
-    logger_.info(
-        EventSource::SYSTEM,
-        2500,
-        "Balance Manager Ready"
-    );
-
     temperature_.init();
-
-    logger_.info(
-        EventSource::SYSTEM,
-        4000,
-        "Temperature Manager Ready"
-    );
-
     current_.init();
-
-    logger_.info(
-        EventSource::SYSTEM,
-        5000,
-        "Current Manager Ready"
-    );
-
-    // Imprime todos os logs de inicialização
-    logger_.flush();
-
     return true;
+}
+
+void App::printFaultHistory()
+{
+    printf("\n=============== FAULT HISTORY ===============\n\n");
+
+    const size_t n = faultHistory_.size();
+    printf("EVENTS : %u\n\n", static_cast<unsigned>(n));
+
+    for (size_t i = 0; i < n; ++i)
+    {
+        const FaultInfo& fi = faultHistory_.at(i);
+
+        printf("#%03u\n", static_cast<unsigned>(i + 1u));
+
+        printf("TIME        : %u ms\n", static_cast<unsigned>(fi.timestamp));
+        printf("FAULT       : %s\n", faultReasonToString(fi.reason));
+        printf("CODE        : 0x%04X\n", fi.code);
+        printf("CELL        : %u\n", static_cast<unsigned>(fi.source));
+        printf("VALUE       : %.3f V\n", fi.value);
+        printf("LIMIT       : %.3f V\n\n", fi.limit);
+    }
+
+    printf("==============================================\n\n");
 }
 
 void App::update()
@@ -226,12 +203,58 @@ void App::update()
 
 
     //-------------------------------------------------
-    // Proteção
+    // Telemetria industrial de falhas
+    //-------------------------------------------------
+
+    const FaultInfo& fi = fault_.getFaultInfo();
+
+    // Push fault history only when we detect a NEW event
+    const bool newEvent =
+        (fi.active != lastFaultActive_) ||
+        (fi.reason != lastFaultReason_) ||
+        (fi.code != lastFaultCode_) ||
+        (fi.source != lastFaultSource_);
+
+if (newEvent && fi.active)
+    {
+        FaultInfo snapshot = fi;
+        snapshot.timestamp = static_cast<std::uint32_t>(Clock::millis());
+
+        faultHistory_.push(snapshot);
+
+        lastFaultActive_ = fi.active;
+        lastFaultReason_ = fi.reason;
+        lastFaultCode_ = fi.code;
+        lastFaultSource_ = fi.source;
+    }
+
+
+    if (fi.active)
+    {
+        printf("\n=============== BMS INDUSTRIAL ===============\n");
+        printf("STATE        : FAULT\n\n");
+
+        printf("FAULT CODE   : 0x%04X\n", fi.code);
+        printf("FAULT NAME   : %s\n", faultReasonToString(fi.reason));
+        printf("SOURCE CELL  : %u\n", static_cast<unsigned>(fi.source));
+        printf("MEASURED     : %.3f V\n", fi.value);
+        printf("LIMIT        : %.3f V\n\n", fi.limit);
+
+        printf("ACTION\n");
+        printf(" CHARGE MOSFET      %s\n", mosfet_.chargeEnabled() ? "ON" : "OFF");
+        printf(" DISCHARGE MOSFET   %s\n", mosfet_.dischargeEnabled() ? "ON" : "OFF");
+        printf(" BALANCE            %s\n", mosfet_.balanceEnabled() ? "ON" : "OFF");
+        printf("==============================================\n\n");
+    }
+
+    //-------------------------------------------------
+    // Proteção (logs de apoio)
     //-------------------------------------------------
 
     char protectionLog[200];
 
     // Log do State Machine (BMS)
+
     const char* bmsStateStr = "IDLE";
 
     switch (stateManager_.getState())
@@ -262,11 +285,7 @@ void App::update()
             break;
     }
 
-    logger_.info(
-        EventSource::SYSTEM,
-        6001,
-        bmsStateStr
-    );
+
 
 
     snprintf(
@@ -278,15 +297,7 @@ void App::update()
         protection_.dischargeEnabled() ? "ON" : "OFF"
     );
 
-    logger_.info(
-        EventSource::PROTECTION,
-        7001,
-        protectionLog
-    );
+    // Sprint 3.2 — Exibir Fault History (após status industrial)
+    printFaultHistory();
 
-    //-------------------------------------------------
-    // Publica todos os eventos pendentes
-    //-------------------------------------------------
-
-    logger_.flush();
 }
