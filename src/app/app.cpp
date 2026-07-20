@@ -1,4 +1,3 @@
-
 #include "app.h"
 
 #include "../../system/clock/clock.h"
@@ -79,11 +78,43 @@ void App::printTelemetry(const BatteryPack& pack)
 
 bool App::init()
 {
+    printf("Loading Fault History...\n");
+
+    faultStorage_.init();
+
+    // Sprint v1.0 (native demo): para evitar carregar histórico antigo e duplicar eventos em toda execução,
+    // trunque o arquivo de histórico no boot.
+    // Em firmware final, isso pode virar uma flag/config (ex.: clear_on_boot).
+    (void)faultStorage_.clear();
+
+    std::vector<FaultInfo> persistedHistory;
+    faultStorage_.load(persistedHistory);
+
+
+    for (const auto& fault : persistedHistory)
+    {
+        faultHistory_.push(fault);
+    }
+
+    if (persistedHistory.empty())
+    {
+        printf("No previous events.\n");
+    }
+    else
+    {
+        printf("History loaded.\n");
+        printf("Events found: %u\n", static_cast<unsigned>(persistedHistory.size()));
+    }
+
     battery_.init();
     protection_.init();
+
+    bmsMachine_.init();
+
     balance_.init();
     temperature_.init();
     current_.init();
+
     return true;
 }
 
@@ -121,13 +152,11 @@ void App::update()
 
     BatteryPack& pack = battery_.getPack();
 
-
     //-------------------------------------------------
     // Current
     //-------------------------------------------------
 
     current_.update(pack.totalVoltage);
-
 
     CurrentData currentData = current_.getData();
 
@@ -135,8 +164,6 @@ void App::update()
     // Mantém potência do pack consistente com a corrente atual.
     pack.current = currentData.currentA;
     pack.power = pack.totalVoltage * pack.current;
-
-
 
     //-------------------------------------------------
     // Temperature
@@ -153,9 +180,6 @@ void App::update()
     pack.maxTemperature = temperatureData.maxTemperature;
     pack.minTemperature = temperatureData.minTemperature;
 
-
-
-
     //-------------------------------------------------
     // Fault / Protection
     //-------------------------------------------------
@@ -165,7 +189,6 @@ void App::update()
     protection_.update(pack, fault_);
 
     //-------------------------------------------------
-
     // BMS State
     //-------------------------------------------------
 
@@ -179,28 +202,17 @@ void App::update()
     pack.discharging = mosfet_.dischargeEnabled();
     pack.balancing = mosfet_.balanceEnabled();
 
-
-
     //-------------------------------------------------
-
     // Balance (futuro: integrar ao MosfetController)
     //-------------------------------------------------
 
-    balance_.update(
-        pack,
-        protection_,
-        battery_
-    );
+    balance_.update(pack, protection_, battery_);
 
     // Para o v1.0 industrial, a camada de MosfetController é a fonte de verdade.
     // ProtectionManager continua existindo para gerar falhas e flags, mas não sobrescreve MOSFETs.
-
     (void)balance_.getStatus();
 
     printTelemetry(pack);
-
-
-
 
     //-------------------------------------------------
     // Telemetria industrial de falhas
@@ -215,19 +227,54 @@ void App::update()
         (fi.code != lastFaultCode_) ||
         (fi.source != lastFaultSource_);
 
-if (newEvent && fi.active)
+    // Edge detection para gravação no FaultStorage
+    static bool faultAlreadySaved = false;
+
+    if (newEvent && fi.active && !faultAlreadySaved)
     {
         FaultInfo snapshot = fi;
         snapshot.timestamp = static_cast<std::uint32_t>(Clock::millis());
 
-        faultHistory_.push(snapshot);
+        // Deduplicação: percorre o faultHistory_ (já carregado no init) e evita append
+        // se já existir entry com code+reason+source.
+        bool alreadyExists = false;
+        const size_t n = faultHistory_.size();
+        for (size_t i = 0; i < n; ++i)
+        {
+            const FaultInfo& prev = faultHistory_.at(i);
+            if (prev.code == snapshot.code && prev.reason == snapshot.reason && prev.source == snapshot.source)
+            {
+                alreadyExists = true;
+                break;
+            }
+        }
+
+        if (!alreadyExists)
+        {
+            faultHistory_.push(snapshot);
+            faultStorage_.append(snapshot);
+
+            printf("[STORAGE] Fault persisted.\n");
+        }
+
+        // Mesmo que seja duplicata, marcamos como salvo para não reavaliar no mesmo active.
+        faultAlreadySaved = true;
 
         lastFaultActive_ = fi.active;
         lastFaultReason_ = fi.reason;
         lastFaultCode_ = fi.code;
         lastFaultSource_ = fi.source;
     }
+    else if (!fi.active)
+    {
+        faultAlreadySaved = false;
 
+        // mantém atualização dos last* para nova detecção
+        lastFaultActive_ = fi.active;
+        lastFaultReason_ = fi.reason;
+        lastFaultCode_ = fi.code;
+        lastFaultSource_ = fi.source;
+    }
 
     if (fi.active)
     {
@@ -254,7 +301,6 @@ if (newEvent && fi.active)
     char protectionLog[200];
 
     // Log do State Machine (BMS)
-
     const char* bmsStateStr = "IDLE";
 
     switch (stateManager_.getState())
@@ -285,8 +331,7 @@ if (newEvent && fi.active)
             break;
     }
 
-
-
+    (void)bmsStateStr;
 
     snprintf(
         protectionLog,
@@ -299,5 +344,5 @@ if (newEvent && fi.active)
 
     // Sprint 3.2 — Exibir Fault History (após status industrial)
     printFaultHistory();
-
 }
+

@@ -109,11 +109,12 @@ void FaultManager::evaluate(const BatteryPack& pack)
         faultInfo_.value = pack.cells[faultInfo_.source - 1u].voltage;
         faultInfo_.limit = CELL_OVERVOLTAGE_LIMIT;
 
-        faultInfo_.timestamp = 0;
+        // timestamp será definido/persistido pelo chamador (ex.: App::update ao salvar no FaultStorage)
         return;
     }
 
     if (hasFault(FAULT_CELL_UNDERVOLTAGE))
+
     {
         faultInfo_.active = true;
         faultInfo_.reason = FaultReason::CELL_UNDERVOLTAGE;
@@ -122,11 +123,12 @@ void FaultManager::evaluate(const BatteryPack& pack)
         faultInfo_.value = pack.cells[faultInfo_.source - 1u].voltage;
 
         faultInfo_.limit = CELL_UNDERVOLTAGE_LIMIT;
-        faultInfo_.timestamp = 0;
+        // timestamp será definido/persistido pelo chamador (ex.: App::update ao salvar no FaultStorage)
         return;
     }
 
     if (hasFault(FAULT_OVER_TEMPERATURE))
+
     {
         faultInfo_.active = true;
         faultInfo_.reason = FaultReason::OVERTEMPERATURE;
@@ -134,11 +136,12 @@ void FaultManager::evaluate(const BatteryPack& pack)
         faultInfo_.source = 0xFF;
         faultInfo_.value = pack.averageTemperature;
         faultInfo_.limit = MAX_TEMPERATURE;
-        faultInfo_.timestamp = 0;
+        // timestamp será definido/persistido pelo chamador (ex.: App::update ao salvar no FaultStorage)
         return;
     }
 
     if (hasFault(FAULT_OVER_CURRENT))
+
     {
         // Nesta fase, o FaultFlag OVER_CURRENT não diferencia carga/descarga.
         faultInfo_.active = true;
@@ -147,11 +150,12 @@ void FaultManager::evaluate(const BatteryPack& pack)
         faultInfo_.source = 0xFF;
         faultInfo_.value = pack.current;
         faultInfo_.limit = MAX_CHARGE_CURRENT;
-        faultInfo_.timestamp = 0;
+        // timestamp será definido/persistido pelo chamador (ex.: App::update ao salvar no FaultStorage)
         return;
     }
 
     // Se chegou aqui, sem FaultInfo mas com flags (ou flags não mapeadas).
+
     // Mantém ativo=false.
 }
 

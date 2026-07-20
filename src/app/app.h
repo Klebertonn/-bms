@@ -8,10 +8,14 @@
 #include "../../core/balance/balance_manager.h"
 #include "../../core/fault/fault_manager.h"
 #include "../../core/state/bms_state_manager.h"
+#include "../../core/state/bms_state_machine.h"
+
 #include "../../core/mosfet/mosfet_controller.h"
 #include "../../core/fault/fault_history.h"
 
 #include "../../system/logger/logger.h"
+#include "../../system/storage/fault_storage.h"
+
 
 
 
@@ -51,12 +55,17 @@ private:
     FaultManager fault_{};
 
     BmsStateManager stateManager_{};
+    BmsStateMachine bmsMachine_{};
 
     BalanceManager balance_{};
+
 
     MosfetController mosfet_{};
 
     FaultHistory faultHistory_{};
+
+    FaultStorage faultStorage_{};
+
 
     // last pushed fault snapshot (avoid repeating the same event)
     bool lastFaultActive_ = false;
