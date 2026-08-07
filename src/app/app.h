@@ -11,6 +11,7 @@
 
 #include "../../core/mosfet/mosfet_controller.h"
 #include "../../core/fault/fault_history.h"
+#include "../../core/fault/fault_sink.h"
 
 #include "../../system/logger/logger.h"
 #include "../../system/storage/fault_storage.h"
@@ -18,6 +19,30 @@
 
 #include "../../lib/hal/gpio/mosfet_driver_interface.h"
 #include "../hal/gpio/mock_mosfet_driver.h"
+
+/*
+ * ==========================================================
+ * Adaptadores de saída (sinks) do FaultManager
+ * (camada de aplicação — composição via Dependency Injection)
+ * ==========================================================
+ * Implementam as abstrações IFaultLogSink / IFaultStorageSink,
+ * conectando o domínio (FaultManager) às infraestruturas concretas
+ * (Logger e FaultStorage) sem acoplar core/fault a elas.
+ */
+
+/* Adaptador: FaultManager -> Logger */
+class FaultLogSinkAdapter : public IFaultLogSink
+{
+public:
+    void onFaultLogged(const FaultEvent& event) override;
+};
+
+/* Adaptador: FaultManager -> FaultStorage */
+class FaultStorageSinkAdapter : public IFaultStorageSink
+{
+public:
+    bool onFaultPersist(const FaultEvent& event) override;
+};
 
 /**
  * @brief Aplicação principal do BMS.
@@ -61,13 +86,13 @@ private:
     FaultStorage faultStorage_{};
     HeartbeatManager heartbeat_{};
 
+    // Adaptadores de saída (Dependency Injection) do FaultManager.
+    FaultLogSinkAdapter faultLogSink_{};
+    FaultStorageSinkAdapter faultStorageSink_{};
+
     // Último snapshot de falha enviado (evita repetir o mesmo evento).
     bool lastFaultActive_ = false;
     FaultReason lastFaultReason_ = FaultReason::NONE;
     std::uint16_t lastFaultCode_ = 0;
     std::uint8_t lastFaultSource_ = 0xFF;
 };
-
-
-
-

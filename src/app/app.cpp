@@ -1,7 +1,37 @@
 #include "app.h"
 
+#include "../../core/fault/fault_registry.h"
 #include "../../system/clock/clock.h"
 #include <cstdio>
+
+/* ==========================================================
+ * Adaptadores de saída do FaultManager (Dependency Injection)
+ * ========================================================== */
+
+/* FaultManager -> Logger */
+void FaultLogSinkAdapter::onFaultLogged(const FaultEvent& event)
+{
+    const char* desc     = FaultRegistry::codeToString(event.code);
+    const char* stateStr = faultStateToString(event.state);
+    const char* sevStr   = faultSeverityToString(event.severity);
+
+    std::printf(
+        "[FAULT] code=%s | state=%s | sev=%s | occ=%lu | desc=%s\n",
+        desc, stateStr, sevStr,
+        static_cast<unsigned long>(event.occurrence),
+        event.description);
+}
+
+/* FaultManager -> FaultStorage */
+bool FaultStorageSinkAdapter::onFaultPersist(const FaultEvent& event)
+{
+    // O FaultStorage é um membro do App; o adapter é stateless e não possui
+    // referência ao storage. A persistência real é feita pelo App::update()
+    // ao observar o evento. Este método é um ponto de extensão para, no futuro,
+    // conectar o FaultStorage diretamente.
+    (void)event;
+    return true;
+}
 
 static const char* protectionStateToString(ProtectionState state)
 {
@@ -58,7 +88,7 @@ void App::printTelemetry(const BatteryPack& pack)
 
     printf("\n");
 
-    printf("TEMP       : %.1f Â°C\n", pack.averageTemperature);
+    printf("TEMP       : %.1f C\n", pack.averageTemperature);
 
     printf("\n");
 
@@ -86,6 +116,13 @@ void App::setMosfetDriver(IMosfetDriver* driver)
 
 bool App::init()
 {
+    // Inicializa o FaultManager e injeta os adaptadores de saída (Dependency Injection).
+    // O FaultManager (core) não conhece Logger/Storage; recebe abstrações
+    // IFaultLogSink e IFaultStorageSink compostas aqui na camada de aplicação.
+    fault_.init();
+    fault_.setLogSink(&faultLogSink_);
+    fault_.setStorageSink(&faultStorageSink_);
+
     printf("Loading Fault History...\n");
 
     faultStorage_.init();

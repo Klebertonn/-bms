@@ -2,11 +2,162 @@
 
 #include <limits>
 
+#include "fault_registry.h"
+
 void FaultManager::init()
 {
     // Mantém compatível com o padrão dos outros managers.
     clear();
+
+    activeCount_ = 0;
+    logSink_ = nullptr;
+    storageSink_ = nullptr;
 }
+
+/* ==========================================================
+ * Injeção de dependência (sinks)
+ * ========================================================== */
+void FaultManager::setLogSink(IFaultLogSink* sink)
+{
+    logSink_ = sink;
+}
+
+void FaultManager::setStorageSink(IFaultStorageSink* sink)
+{
+    storageSink_ = sink;
+}
+
+/* ==========================================================
+ * API DTC
+ * ========================================================== */
+
+void FaultManager::raiseFault(FaultCode code)
+{
+    const FaultSeverity sev = FaultRegistry::findSeverity(code);
+    raiseFault(code, sev, FaultState::ACTIVE);
+}
+
+void FaultManager::raiseFault(FaultCode code, FaultSeverity severity, FaultState state)
+{
+    if (code == FaultCode::NONE)
+    {
+        return;
+    }
+
+    // Se já está ativo, incrementa ocorrência e atualiza (não duplica).
+    const std::size_t idx = findActive(code);
+    if (idx < activeCount_)
+    {
+        FaultEvent& existing = activeFaults_[idx];
+        ++existing.occurrence;
+        existing.state = state;
+        existing.severity = severity;
+        publishToLog(existing);
+        persistToStorage(existing);
+        return;
+    }
+
+    // Novo evento ativo.
+    if (activeCount_ < MAX_ACTIVE_FAULTS)
+    {
+        FaultEvent& ev = activeFaults_[activeCount_];
+        ev.code = code;
+        ev.severity = severity;
+        ev.state = state;
+        ev.timestamp = 0;           // preenchido pelo sink de log (clock)
+        ev.occurrence = 1;
+        ev.setDescription(FaultRegistry::findDescription(code));
+        ++activeCount_;
+
+        publishToLog(ev);
+        persistToStorage(ev);
+    }
+}
+
+void FaultManager::clearFault(FaultCode code)
+{
+    const std::size_t idx = findActive(code);
+    if (idx >= activeCount_)
+    {
+        return;
+    }
+
+    FaultEvent& ev = activeFaults_[idx];
+    ev.state = FaultState::CLEARED;
+    ev.timestamp = 0; // marcado para atualização no sink/logger
+
+    publishToLog(ev);
+    persistToStorage(ev);
+
+    // Remove do conjunto ativo (shift para trás).
+    --activeCount_;
+    for (std::size_t i = idx; i < activeCount_; ++i)
+    {
+        activeFaults_[i] = activeFaults_[i + 1u];
+    }
+    activeFaults_[activeCount_] = FaultEvent{};
+}
+
+bool FaultManager::hasFault() const
+{
+    return activeCount_ > 0;
+}
+
+bool FaultManager::hasFault(FaultCode code) const
+{
+    return findActive(code) < activeCount_;
+}
+
+std::size_t FaultManager::getActiveFaults() const
+{
+    return activeCount_;
+}
+
+bool FaultManager::getActiveFault(std::size_t index, FaultEvent& out) const
+{
+    if (index >= activeCount_)
+    {
+        return false;
+    }
+    out = activeFaults_[index];
+    return true;
+}
+
+/* ==========================================================
+ * Internos
+ * ========================================================== */
+
+std::size_t FaultManager::findActive(FaultCode code) const
+{
+    for (std::size_t i = 0; i < activeCount_; ++i)
+    {
+        if (activeFaults_[i].code == code)
+        {
+            return i;
+        }
+    }
+    return MAX_ACTIVE_FAULTS;
+}
+
+void FaultManager::publishToLog(const FaultEvent& event)
+{
+    if (logSink_ != nullptr)
+    {
+        logSink_->onFaultLogged(event);
+    }
+}
+
+void FaultManager::persistToStorage(const FaultEvent& event)
+{
+    if (storageSink_ != nullptr)
+    {
+        storageSink_->onFaultPersist(event);
+    }
+}
+
+/* ==========================================================
+ * API legada (compatibilidade)
+ * ========================================================== */
 
 void FaultManager::clear()
 {
@@ -16,30 +167,25 @@ void FaultManager::clear()
 
 void FaultManager::addFault(FaultFlag fault)
 {
-    flags |= static_cast<uint32_t>(fault);
-}
-
-bool FaultManager::hasFault() const
-{
-    return flags != FAULT_NONE;
+    flags |= static_cast<std::uint32_t>(fault);
 }
 
 bool FaultManager::hasFault(FaultFlag fault) const
 {
-    return (flags & static_cast<uint32_t>(fault)) != 0u;
+    return (flags & static_cast<std::uint32_t>(fault)) != 0u;
 }
 
-uint32_t FaultManager::getFaults() const
+std::uint32_t FaultManager::getFaults() const
 {
     return flags;
 }
 
-static uint8_t findMaxCellIndex1Based(const BatteryPack& pack)
+static std::uint8_t findMaxCellIndex1Based(const BatteryPack& pack)
 {
     float maxV = -std::numeric_limits<float>::infinity();
-    uint8_t bestCell0 = 0;
+    std::uint8_t bestCell0 = 0;
 
-    for (uint8_t i = 0; i < PACK_CELL_COUNT; ++i)
+    for (std::uint8_t i = 0; i < PACK_CELL_COUNT; ++i)
     {
         const float v = pack.cells[i].voltage;
         if (pack.cells[i].valid && v > maxV)
@@ -49,16 +195,15 @@ static uint8_t findMaxCellIndex1Based(const BatteryPack& pack)
         }
     }
 
-    // Telemetria industrial geralmente usa CELL 1..N.
-    return static_cast<uint8_t>(bestCell0 + 1);
+    return static_cast<std::uint8_t>(bestCell0 + 1);
 }
 
-static uint8_t findMinCellIndex1Based(const BatteryPack& pack)
+static std::uint8_t findMinCellIndex1Based(const BatteryPack& pack)
 {
     float minV = std::numeric_limits<float>::infinity();
-    uint8_t bestCell0 = 0;
+    std::uint8_t bestCell0 = 0;
 
-    for (uint8_t i = 0; i < PACK_CELL_COUNT; ++i)
+    for (std::uint8_t i = 0; i < PACK_CELL_COUNT; ++i)
     {
         const float v = pack.cells[i].voltage;
         if (pack.cells[i].valid && v < minV)
@@ -68,7 +213,7 @@ static uint8_t findMinCellIndex1Based(const BatteryPack& pack)
         }
     }
 
-    return static_cast<uint8_t>(bestCell0 + 1);
+    return static_cast<std::uint8_t>(bestCell0 + 1);
 }
 
 void FaultManager::evaluate(const BatteryPack& pack)
@@ -97,38 +242,29 @@ void FaultManager::evaluate(const BatteryPack& pack)
     }
 
     // 2) Deriva FaultInfo (prioridade simples: primeiro fault detectado)
-    // Para manter comportamento determinístico, usamos ordem fixa.
-
     if (hasFault(FAULT_CELL_OVERVOLTAGE))
     {
         faultInfo_.active = true;
         faultInfo_.reason = FaultReason::CELL_OVERVOLTAGE;
         faultInfo_.code = 0x0101;
         faultInfo_.source = findMaxCellIndex1Based(pack);
-        // value/limit devem usar o índice 0-based interno do pack.
         faultInfo_.value = pack.cells[faultInfo_.source - 1u].voltage;
         faultInfo_.limit = CELL_OVERVOLTAGE_LIMIT;
-
-        // timestamp será definido/persistido pelo chamador (ex.: App::update ao salvar no FaultStorage)
         return;
     }
 
     if (hasFault(FAULT_CELL_UNDERVOLTAGE))
-
     {
         faultInfo_.active = true;
         faultInfo_.reason = FaultReason::CELL_UNDERVOLTAGE;
         faultInfo_.code = 0x0102;
         faultInfo_.source = findMinCellIndex1Based(pack);
         faultInfo_.value = pack.cells[faultInfo_.source - 1u].voltage;
-
         faultInfo_.limit = CELL_UNDERVOLTAGE_LIMIT;
-        // timestamp será definido/persistido pelo chamador (ex.: App::update ao salvar no FaultStorage)
         return;
     }
 
     if (hasFault(FAULT_OVER_TEMPERATURE))
-
     {
         faultInfo_.active = true;
         faultInfo_.reason = FaultReason::OVERTEMPERATURE;
@@ -136,28 +272,17 @@ void FaultManager::evaluate(const BatteryPack& pack)
         faultInfo_.source = 0xFF;
         faultInfo_.value = pack.averageTemperature;
         faultInfo_.limit = MAX_TEMPERATURE;
-        // timestamp será definido/persistido pelo chamador (ex.: App::update ao salvar no FaultStorage)
         return;
     }
 
     if (hasFault(FAULT_OVER_CURRENT))
-
     {
-        // Nesta fase, o FaultFlag OVER_CURRENT não diferencia carga/descarga.
         faultInfo_.active = true;
         faultInfo_.reason = FaultReason::OVERCURRENT_CHARGE;
         faultInfo_.code = 0x0301;
         faultInfo_.source = 0xFF;
         faultInfo_.value = pack.current;
         faultInfo_.limit = MAX_CHARGE_CURRENT;
-        // timestamp será definido/persistido pelo chamador (ex.: App::update ao salvar no FaultStorage)
         return;
     }
-
-    // Se chegou aqui, sem FaultInfo mas com flags (ou flags não mapeadas).
-
-    // Mantém ativo=false.
 }
-
-
-
