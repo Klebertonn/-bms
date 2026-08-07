@@ -58,7 +58,7 @@ void App::printTelemetry(const BatteryPack& pack)
 
     printf("\n");
 
-    printf("TEMP       : %.1f °C\n", pack.averageTemperature);
+    printf("TEMP       : %.1f Â°C\n", pack.averageTemperature);
 
     printf("\n");
 
@@ -74,6 +74,14 @@ void App::printTelemetry(const BatteryPack& pack)
     printf("\n");
 
     printf("=============================================\n\n");
+}
+
+void App::setMosfetDriver(IMosfetDriver* driver)
+{
+    if (driver != nullptr)
+    {
+        mosfetDriver_ = driver;
+    }
 }
 
 bool App::init()
@@ -106,14 +114,25 @@ bool App::init()
         printf("Events found: %u\n", static_cast<unsigned>(persistedHistory.size()));
     }
 
+    // Inicializa o driver de MOSFET (mock por padrão, ou HAL real no esp32dev).
+    mosfetDriver_->init();
+
     battery_.init();
     protection_.init();
 
-    bmsMachine_.init();
+    bmsStateMachine_.init();
+
+    // Sprint 5.2 — Passo 2: avança BOOT -> INIT -> SELF_TEST -> READY na inicialização.
+    bmsStateMachine_.update();
+    bmsStateMachine_.update();
+    bmsStateMachine_.update();
 
     balance_.init();
     temperature_.init();
     current_.init();
+
+    // Sprint Heartbeat — inicializa o heartbeat do firmware.
+    heartbeat_.init();
 
     return true;
 }
@@ -189,18 +208,25 @@ void App::update()
     protection_.update(pack, fault_);
 
     //-------------------------------------------------
+    // BMS State Machine (Sprint 5.2 — Passo 2)
+    // A máquina ainda NÃO controla MOSFET; apenas informa seu estado.
+    //-------------------------------------------------
+
+    bmsStateMachine_.update();
+
+    //-------------------------------------------------
     // BMS State
     //-------------------------------------------------
 
     stateManager_.update(pack, fault_);
 
     // MOSFET é uma ação derivada do estado: State → MOSFET → Telemetria
-    mosfet_.applyState(stateManager_.getState());
+    mosfetDriver_->applyState(stateManager_.getState());
 
     // Telemetria lê o estado real dos MOSFETs
-    pack.charging = mosfet_.chargeEnabled();
-    pack.discharging = mosfet_.dischargeEnabled();
-    pack.balancing = mosfet_.balanceEnabled();
+    pack.charging = mosfetDriver_->chargeEnabled();
+    pack.discharging = mosfetDriver_->dischargeEnabled();
+    pack.balancing = mosfetDriver_->balanceEnabled();
 
     //-------------------------------------------------
     // Balance (futuro: integrar ao MosfetController)
@@ -279,7 +305,8 @@ void App::update()
     if (fi.active)
     {
         printf("\n=============== BMS INDUSTRIAL ===============\n");
-        printf("STATE        : FAULT\n\n");
+        printf("STATE MACHINE : %s\n", bmsStateMachine_.toString());
+        printf("STATE         : %s\n\n", stateManager_.toString());
 
         printf("FAULT CODE   : 0x%04X\n", fi.code);
         printf("FAULT NAME   : %s\n", faultReasonToString(fi.reason));
@@ -288,9 +315,9 @@ void App::update()
         printf("LIMIT        : %.3f V\n\n", fi.limit);
 
         printf("ACTION\n");
-        printf(" CHARGE MOSFET      %s\n", mosfet_.chargeEnabled() ? "ON" : "OFF");
-        printf(" DISCHARGE MOSFET   %s\n", mosfet_.dischargeEnabled() ? "ON" : "OFF");
-        printf(" BALANCE            %s\n", mosfet_.balanceEnabled() ? "ON" : "OFF");
+        printf(" CHARGE MOSFET      %s\n", mosfetDriver_->chargeEnabled() ? "ON" : "OFF");
+        printf(" DISCHARGE MOSFET   %s\n", mosfetDriver_->dischargeEnabled() ? "ON" : "OFF");
+        printf(" BALANCE            %s\n", mosfetDriver_->balanceEnabled() ? "ON" : "OFF");
         printf("==============================================\n\n");
     }
 
@@ -344,5 +371,15 @@ void App::update()
 
     // Sprint 3.2 — Exibir Fault History (após status industrial)
     printFaultHistory();
-}
 
+    //-------------------------------------------------
+    // Heartbeat (Sprint Heartbeat)
+    // Alimenta dados (estado, SOC, temperatura) e emite a cada 1000 ms.
+    //-------------------------------------------------
+
+    heartbeat_.setState(bmsStateMachine_.toString());
+    heartbeat_.setSOC(pack.soc);
+    heartbeat_.setTemperature(pack.averageTemperature);
+
+    heartbeat_.update();
+}

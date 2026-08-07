@@ -5,6 +5,12 @@ class MockCurrentSensor : public ICurrentSensor
 {
 public:
 
+    bool begin() override
+    {
+        // Mock: sempre inicializado.
+        return true;
+    }
+
     float readCurrentA() override
     {
         return 2.35f;

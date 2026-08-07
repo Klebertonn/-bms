@@ -6,6 +6,10 @@ class ICurrentSensor
 public:
     virtual ~ICurrentSensor() = default;
 
+    // Inicializa o sensor de corrente (ex.: INA219 via I²C).
+    // Retorna true se o sensor foi inicializado com sucesso.
+    virtual bool begin() = 0;
+
     // Corrente do pack (A). Sinal positivo = carregando (conforme convenção do projeto).
     virtual float readCurrentA() = 0;
 

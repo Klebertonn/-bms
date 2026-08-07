@@ -1,0 +1,333 @@
+/* ==========================================================
+   BMS Dashboard — Folha de Estilos
+   ========================================================== */
+
+/* ---------- Variáveis ---------- */
+:root {
+    --color-bg:        #0f172a;
+    --color-surface:   #1e293b;
+    --color-surface-2: #334155;
+    --color-border:    #334155;
+    --color-text:      #e2e8f0;
+    --color-muted:     #94a3b8;
+
+    --color-primary:   #38bdf8;
+    --color-success:   #34d399;
+    --color-warning:   #fbbf24;
+    --color-danger:    #f87171;
+    --color-soc:       #22c55e;
+    --color-soh:       #3b82f6;
+    --color-temp:      #f97316;
+
+    --radius: 12px;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* ---------- Reset ---------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: var(--font);
+    background: radial-gradient(circle at top left, #1e293b, var(--color-bg));
+    color: var(--color-text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ---------- Header ---------- */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: rgba(30, 41, 59, 0.85);
+    border-bottom: 1px solid var(--color-border);
+    backdrop-filter: blur(4px);
+}
+
+.header__brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.header__logo {
+    font-size: 2rem;
+}
+
+.header__title {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.header__subtitle {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+}
+
+/* ---------- Heartbeat ---------- */
+.heartbeat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+}
+
+.heartbeat__dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-muted);
+    transition: background 0.3s;
+}
+
+.heartbeat__dot--alive {
+    background: var(--color-success);
+    animation: pulse 1.2s infinite;
+}
+
+.heartbeat__dot--dead {
+    background: var(--color-danger);
+}
+
+.heartbeat__label {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+}
+
+@keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.5); }
+    70%  { box-shadow: 0 0 0 8px rgba(52, 211, 153, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+}
+
+/* ---------- Container / Grid ---------- */
+.container {
+    flex: 1;
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.grid--col-2 {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+/* ---------- Cards ---------- */
+.card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    box-shadow: var(--shadow);
+}
+
+.card--wide {
+    grid-column: 1 / -1;
+}
+
+.card__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-muted);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.card__count {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+}
+
+/* ---------- Status Card ---------- */
+.status-card__body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.badge {
+    padding: 0.5rem 1.25rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    background: var(--color-muted);
+    color: #0f172a;
+}
+
+.badge--idle     { background: var(--color-muted); }
+.badge--charging { background: var(--color-success); }
+.badge--discharge{ background: var(--color-primary); }
+.badge--balance  { background: var(--color-warning); }
+.badge--fault    { background: var(--color-danger); }
+.badge--ready    { background: var(--color-success); }
+
+.status-card__flags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.flag {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.75rem;
+    background: var(--color-surface-2);
+    border-radius: 8px;
+    color: var(--color-muted);
+}
+
+/* ---------- Métricas ---------- */
+.metric__label {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.metric__value {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.metric__hint {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    margin-top: 0.5rem;
+}
+
+.metric--fault .metric__value {
+    color: var(--color-danger);
+}
+
+/* ---------- Progress bar ---------- */
+.progress {
+    height: 14px;
+    background: var(--color-surface-2);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 0.75rem;
+}
+
+.progress__bar {
+    height: 100%;
+    background: var(--color-soc);
+    border-radius: 999px;
+    transition: width 0.6s ease;
+}
+
+/* ---------- Gráficos ---------- */
+.chart-wrap {
+    position: relative;
+    height: 260px;
+    width: 100%;
+}
+
+/* ---------- Tabela ---------- */
+.table-wrap {
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.table th,
+.table td {
+    text-align: left;
+    padding: 0.65rem 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+    white-space: nowrap;
+}
+
+.table th {
+    color: var(--color-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+.table tbody tr:hover {
+    background: var(--color-surface-2);
+}
+
+.table__empty {
+    text-align: center;
+    color: var(--color-muted);
+    padding: 2rem !important;
+}
+
+/* ---------- Footer ---------- */
+.footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--color-border);
+    color: var(--color-muted);
+    font-size: 0.85rem;
+}
+
+/* ---------- Responsividade ---------- */
+@media (max-width: 768px) {
+    html { font-size: 14px; }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .container { padding: 1rem; }
+
+    .metric__value { font-size: 1.6rem; }
+
+    .status-card__body { flex-direction: column; align-items: flex-start; }
+
+    .grid--col-2 { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+    .metric__value { font-size: 1.4rem; }
+    .chart-wrap { height: 200px; }
+}

@@ -2,7 +2,6 @@
 #include "battery_manager.h"
 
 #include "../../lib/hal/adc/adc_interface.h"
-#include "../../lib/system/logger/logger.h"
 
 extern IADC& adc;
 

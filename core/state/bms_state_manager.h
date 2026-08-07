@@ -25,6 +25,8 @@ public:
 
     BmsState getState() const;
 
+    const char* toString() const;
+
 private:
     BmsState state_ = BmsState::INIT;
 

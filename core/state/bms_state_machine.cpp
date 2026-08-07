@@ -17,6 +17,37 @@ void BmsStateMachine::setState(BmsIndustrialState s)
     transitionTo(s);
 }
 
+const char* BmsStateMachine::toString() const
+{
+    switch (currentState_)
+    {
+        case BmsIndustrialState::BOOT:
+            return "BOOT";
+        case BmsIndustrialState::INIT:
+            return "INIT";
+        case BmsIndustrialState::SELF_TEST:
+            return "SELF_TEST";
+        case BmsIndustrialState::READY:
+            return "READY";
+        case BmsIndustrialState::IDLE:
+            return "IDLE";
+        case BmsIndustrialState::CHARGING:
+            return "CHARGING";
+        case BmsIndustrialState::DISCHARGING:
+            return "DISCHARGING";
+        case BmsIndustrialState::BALANCING:
+            return "BALANCING";
+        case BmsIndustrialState::FAULT:
+            return "FAULT";
+        case BmsIndustrialState::RECOVERY:
+            return "RECOVERY";
+        case BmsIndustrialState::SHUTDOWN:
+            return "SHUTDOWN";
+        default:
+            return "UNKNOWN";
+    }
+}
+
 void BmsStateMachine::transitionTo(BmsIndustrialState s)
 {
     if (s == currentState_)
@@ -44,32 +75,42 @@ void BmsStateMachine::update()
 
         case BmsIndustrialState::INIT:
             transitionTo(BmsIndustrialState::SELF_TEST);
-            selfTestCounter_ = 0;
             break;
 
-        case BmsIndustrialState::SELF_TEST:
-            // Deterministic SELF_TEST duration for Sprint 5.1: 3 update() cycles.
-            selfTestCounter_++;
-            if (selfTestCounter_ >= SELF_TEST_CYCLES)
+case BmsIndustrialState::SELF_TEST:
+            // Executa o Power-On Self Test (POST).
+            // PASS  -> READY
+            // FAIL  -> FAULT
+            selfTest_.run();
+            if (selfTest_.passed())
             {
                 transitionTo(BmsIndustrialState::READY);
+            }
+            else
+            {
+                transitionTo(BmsIndustrialState::FAULT);
             }
             break;
 
         case BmsIndustrialState::READY:
-            // Sub-modes can be decided later; default to IDLE.
-            transitionTo(BmsIndustrialState::IDLE);
             break;
 
-        case BmsIndustrialState::IDLE:
         case BmsIndustrialState::CHARGING:
+            break;
+
         case BmsIndustrialState::DISCHARGING:
+            break;
+
         case BmsIndustrialState::BALANCING:
+            break;
+
         case BmsIndustrialState::FAULT:
+            break;
+
         case BmsIndustrialState::RECOVERY:
+            break;
+
         case BmsIndustrialState::SHUTDOWN:
-        default:
-            // Keep stable for Sprint 5.1 (architecture base).
             break;
     }
 }

@@ -1,14 +1,24 @@
-# TODO — Sprint 4.1.4 (Passo 1)
+# TODO — Preparação para Produção (Release 1.0)
 
-- [x] Adicionar FaultStorage ao App
-  - [ ] Editar `src/app/app.h`: incluir `fault_storage.h` e adicionar `FaultStorage faultStorage_{};`
+## Fase 1 — Revisão de Arquitetura e Código Morto
+- [x] Revisar arquitetura e documentar em `docs/ARCHITECTURE.md`
+- [x] Remover/desabilitar código morto com segurança (sem quebrar build)
+- [x] Padronizar nomes e formatação (ex.: `app.h`)
 
-- [ ] Carregar histórico no boot
-  - [ ] Editar `src/app/app.cpp`: atualizar `App::init()` com:
-    - `faultStorage_.init();`
-    - `std::vector<FaultInfo> persistedHistory; faultStorage_.load(persistedHistory);`
-    - copiar para `faultHistory_` com `faultHistory_.push(fault)`
-    - prints: Loading / History loaded / Events found: X ou No previous events.
-- [ ] Compilar e validar
-  - [ ] Rodar 2 vezes e validar mensagens esperadas
+## Fase 2 — Documentação
+- [x] `README.md` completo
+- [x] `docs/ARCHITECTURE.md`
+- [x] `CHANGELOG.md`
+- [x] `LICENSE` (MIT)
+- [x] `SECURITY.md`
+- [x] `CONTRIBUTING.md`
+- [x] `docs/PRODUCTION.md` (checklist industrial)
 
+## Fase 3 — Estrutura GitHub
+- [x] Atualizar `.gitignore`
+- [x] `docs/RELEASE.md`
+- [x] Badges no README
+
+## Fase 4 — Validação
+- [x] `pio run -e native` (BUILD OK)
+- [x] Revisão final + checklist industrial

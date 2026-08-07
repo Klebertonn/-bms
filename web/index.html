@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMS Dashboard — Battery Management System</title>
+
+    <!-- Folha de estilos -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Gráficos (Chart.js via CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- ====== Cabeçalho ====== -->
+    <header class="header">
+        <div class="header__brand">
+            <span class="header__logo">⚡</span>
+            <div>
+                <h1 class="header__title">BMS Dashboard</h1>
+                <p class="header__subtitle">Battery Management System</p>
+            </div>
+        </div>
+
+        <div class="heartbeat">
+            <span class="heartbeat__dot" id="heartbeatDot"></span>
+            <span class="heartbeat__label" id="heartbeatLabel">Aguardando...</span>
+        </div>
+    </header>
+
+    <!-- ====== Painel principal ====== -->
+    <main class="container">
+
+        <!-- Estado geral -->
+        <section class="card card--wide status-card">
+            <h2 class="card__title">Estado do Sistema</h2>
+            <div class="status-card__body">
+                <div class="status-card__state">
+                    <span class="badge" id="stateBadge">—</span>
+                </div>
+                <div class="status-card__flags">
+                    <span class="flag" id="flagCharging">Carregando: —</span>
+                    <span class="flag" id="flagDischarging">Descarregando: —</span>
+                    <span class="flag" id="flagBalancing">Balanço: —</span>
+                    <span class="flag" id="flagValid">Pack Válido: —</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cards de métricas -->
+        <div class="grid">
+
+            <article class="card metric">
+                <h2 class="metric__label">SOC</h2>
+                <p class="metric__value" id="socValue">—</p>
+                <div class="progress">
+                    <div class="progress__bar" id="socBar" style="width:0%"></div>
+                </div>
+                <p class="metric__hint" id="socHint">—</p>
+            </article>
+
+            <article class="card metric">
+                <h2 class="metric__label">SOH</h2>
+                <p class="metric__value" id="sohValue">—</p>
+                <p class="metric__hint" id="sohHint">Saúde da bateria</p>
+            </article>
+
+            <article class="card metric">
+                <h2 class="metric__label">Tensão do Pack</h2>
+                <p class="metric__value" id="packVoltage">—</p>
+                <p class="metric__hint" id="packDelta">ΔV: —</p>
+            </article>
+
+            <article class="card metric">
+                <h2 class="metric__label">Corrente</h2>
+                <p class="metric__value" id="packCurrent">—</p>
+                <p class="metric__hint" id="packPower">Potência: —</p>
+            </article>
+
+            <article class="card metric">
+                <h2 class="metric__label">Temperatura</h2>
+                <p class="metric__value" id="packTemp">—</p>
+                <p class="metric__hint" id="tempRange">Min: — / Máx: —</p>
+            </article>
+
+            <article class="card metric metric--fault">
+                <h2 class="metric__label">Fault Ativa</h2>
+                <p class="metric__value" id="faultValue">—</p>
+                <p class="metric__hint" id="faultInfo">Nenhuma falha</p>
+            </article>
+
+        </div>
+
+        <!-- Gráficos -->
+        <div class="grid grid--col-2">
+            <section class="card card--wide">
+                <h2 class="card__title">Tensão do Pack (V)</h2>
+                <div class="chart-wrap">
+                    <canvas id="voltageChart"></canvas>
+                </div>
+            </section>
+
+            <section class="card card--wide">
+                <h2 class="card__title">Corrente (A)</h2>
+                <div class="chart-wrap">
+                    <canvas id="currentChart"></canvas>
+                </div>
+            </section>
+        </div>
+
+        <div class="grid grid--col-2">
+            <section class="card card--wide">
+                <h2 class="card__title">SOC (%)</h2>
+                <div class="chart-wrap">
+                    <canvas id="socChart"></canvas>
+                </div>
+            </section>
+
+            <section class="card card--wide">
+                <h2 class="card__title">Temperatura (°C)</h2>
+                <div class="chart-wrap">
+                    <canvas id="tempChart"></canvas>
+                </div>
+            </section>
+        </div>
+
+        <!-- Histórico de falhas -->
+        <section class="card card--wide">
+            <div class="card__header">
+                <h2 class="card__title">Histórico de Falhas</h2>
+                <span class="card__count" id="faultCount">0 eventos</span>
+            </div>
+            <div class="table-wrap">
+                <table class="table" id="faultTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Timestamp</th>
+                            <th>Falha</th>
+                            <th>Código</th>
+                            <th>Célula</th>
+                            <th>Valor</th>
+                            <th>Limite</th>
+                        </tr>
+                    </thead>
+                    <tbody id="faultTableBody">
+                        <tr><td colspan="7" class="table__empty">Nenhum evento registrado</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="footer">
+        <span>BMS Dashboard</span>
+        <span id="lastUpdate">Última atualização: —</span>
+    </footer>
+
+    <!-- Lógica do dashboard -->
+    <script src="js/data-source.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
+

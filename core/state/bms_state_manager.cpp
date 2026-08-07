@@ -10,6 +10,29 @@ BmsState BmsStateManager::getState() const
     return state_;
 }
 
+const char* BmsStateManager::toString() const
+{
+    switch (state_)
+    {
+        case BmsState::INIT:
+            return "INIT";
+        case BmsState::IDLE:
+            return "IDLE";
+        case BmsState::CHARGING:
+            return "CHARGING";
+        case BmsState::DISCHARGING:
+            return "DISCHARGING";
+        case BmsState::BALANCING:
+            return "BALANCING";
+        case BmsState::FAULT:
+            return "FAULT";
+        case BmsState::SHUTDOWN:
+            return "SHUTDOWN";
+        default:
+            return "UNKNOWN";
+    }
+}
+
 bool BmsStateManager::isFaultCritical(const FaultManager& faults) const
 {
     // Regra inicial: qualquer falha (por enquanto) leva ao estado FAULT.

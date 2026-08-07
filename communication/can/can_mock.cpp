@@ -5,6 +5,12 @@
 class MockCANDriver : public ICANDriver
 {
 public:
+    bool begin() override
+    {
+        // Mock: sempre inicializado.
+        return true;
+    }
+
     bool send(const CANFrame& frame) override
     {
         (void)frame;
