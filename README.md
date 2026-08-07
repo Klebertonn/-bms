@@ -48,14 +48,24 @@ Este projeto implementa o firmware de controle e proteção de um pacote de bate
 │   ├── hal/            # Mocks e drivers de hardware
 │   └── main.cpp        # Ponto de entrada native (PC)
 │   └── main_esp32.cpp  # Ponto de entrada ESP32 (hardware real)
-├── include/            # Headers de interfaces
 ├── config/             # Configuração do sistema (limites, pinos)
-├── test/               # Testes unitários e de integração
-├── web/                # Dashboard web
 ├── docs/               # Documentação (SRS, DDS, ICD, arquitetura, produção)
+├── tests/              # Testes unitários e de integração (Unity)
+├── scripts/            # Scripts de automação (geração de relatório)
+├── web/                # Dashboard web
+├── hardware/           # Artefatos de hardware (esquemas, pinagem, datasheets)
+├── firmware/           # Mapeamento lógico do firmware (código na raiz)
+├── simulation/         # Mapeamento lógico da simulação/mocks
+├── tools/              # Ferramentas auxiliares
+├── MIGRATION.md        # Plano de migração da reorganização
 ├── platformio.ini      # Configuração do PlatformIO
 └── TODO.md             # Status do desenvolvimento
 ```
+
+> **Nota de reorganização:** para não quebrar includes e o build, o código-fonte
+> (`core/`, `system/`, `communication/`, `lib/`, `src/`, `config/`) permanece
+> fisicamente na raiz. As pastas `firmware/`, `simulation/`, `hardware/`, `tests/`,
+> `scripts/` e `tools/` organizam a estrutura lógica. Veja `MIGRATION.md`.
 
 ---
 
@@ -93,10 +103,10 @@ pio run -e esp32dev -t upload && pio device monitor
 pio test -e native
 ```
 
-Os testes usam o framework **Unity** (em `test/`). Para gerar o relatório:
+Os testes usam o framework **Unity** (em `tests/`). Para gerar o relatório:
 
 ```bash
-python test/generate_report.py
+python scripts/generate_report.py
 ```
 
 ---
