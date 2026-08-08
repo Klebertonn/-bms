@@ -42,6 +42,9 @@ enum class FaultState : std::uint8_t
 /* Tamanho máximo da descrição do evento */
 constexpr std::size_t FAULT_DESC_MAX = 64u;
 
+/* Valor especial quando a falha não possui célula específica (pack/global). */
+constexpr std::uint8_t FAULT_SOURCE_GLOBAL = 0xFFu;
+
 struct FaultEvent
 {
     FaultCode code = FaultCode::NONE;          // Código DTC
@@ -49,6 +52,9 @@ struct FaultEvent
     FaultState state = FaultState::ACTIVE;     // Estado da falha
     std::uint32_t timestamp = 0;               // Tempo do evento (ms)
     std::uint32_t occurrence = 0;              // Contador de ocorrências
+    std::uint8_t source = FAULT_SOURCE_GLOBAL; // Célula (1..N) ou FAULT_SOURCE_GLOBAL
+    float measuredValue = 0.0f;                // Valor medido no momento da falha
+    float limit = 0.0f;                        // Limiar que disparou a falha
     char description[FAULT_DESC_MAX] = {0};    // Descrição legível
 
     // Atalho: define a descrição com segurança (trunca se necessário).

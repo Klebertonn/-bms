@@ -10,7 +10,7 @@ class ProtectionManager
 public:
 void init();
 
-    void update(BatteryPack& pack,
+    void update(const BatteryPack& pack,
                 FaultManager& faults);
 
 

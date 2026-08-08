@@ -23,14 +23,22 @@ void FaultLogSinkAdapter::onFaultLogged(const FaultEvent& event)
 }
 
 /* FaultManager -> FaultStorage */
+void FaultStorageSinkAdapter::setStorage(FaultStorage* storage)
+{
+    storage_ = storage;
+}
+
 bool FaultStorageSinkAdapter::onFaultPersist(const FaultEvent& event)
 {
-    // O FaultStorage é um membro do App; o adapter é stateless e não possui
-    // referência ao storage. A persistência real é feita pelo App::update()
-    // ao observar o evento. Este método é um ponto de extensão para, no futuro,
-    // conectar o FaultStorage diretamente.
-    (void)event;
-    return true;
+    // Persiste o evento DTC no backend real (FaultStorage).
+    // O FaultStorage é injetado pela camada de aplicação; o domínio
+    // (FaultManager) não conhece a implementação concreta.
+    if (storage_ == nullptr)
+    {
+        return false;
+    }
+
+    return storage_->appendEvent(event);
 }
 
 static const char* protectionStateToString(ProtectionState state)
@@ -121,16 +129,22 @@ bool App::init()
     // IFaultLogSink e IFaultStorageSink compostas aqui na camada de aplicação.
     fault_.init();
     fault_.setLogSink(&faultLogSink_);
+    faultStorageSink_.setStorage(&faultStorage_);
     fault_.setStorageSink(&faultStorageSink_);
 
     printf("Loading Fault History...\n");
 
-    faultStorage_.init();
+faultStorage_.init();
 
-    // Sprint v1.0 (native demo): para evitar carregar histórico antigo e duplicar eventos em toda execução,
-    // trunque o arquivo de histórico no boot.
-    // Em firmware final, isso pode virar uma flag/config (ex.: clear_on_boot).
-    (void)faultStorage_.clear();
+    // Política industrial: NÃO limpar o histórico automaticamente no boot.
+    // Carregamos o histórico persistido e o restauramos na FaultHistory (RAM).
+    // Se a demonstração native precisar de um boot limpo, use
+    // CLEAR_FAULT_HISTORY_ON_BOOT = true (comportamento explícito e configurável).
+    constexpr bool CLEAR_FAULT_HISTORY_ON_BOOT = false;
+    if (CLEAR_FAULT_HISTORY_ON_BOOT)
+    {
+        (void)faultStorage_.clear();
+    }
 
     std::vector<FaultInfo> persistedHistory;
     faultStorage_.load(persistedHistory);
@@ -236,11 +250,18 @@ void App::update()
     pack.maxTemperature = temperatureData.maxTemperature;
     pack.minTemperature = temperatureData.minTemperature;
 
-    //-------------------------------------------------
+//-------------------------------------------------
     // Fault / Protection
     //-------------------------------------------------
 
-    fault_.evaluate(pack);
+    // LEGACY COMPATIBILITY ONLY:
+    // fault_.evaluate(pack) está desabilitado como mecanismo primário.
+    // A detecção agora é centralizada no ProtectionManager, que chama
+    // fault_.raiseFault()/clearFault() para gerar os DTCs.
+    // Manter evaluate() desabilitado evita duplicação de DTC entre os
+    // dois caminhos de detecção (legado FaultFlag vs novo DTC).
+    //
+    // fault_.evaluate(pack);
 
     protection_.update(pack, fault_);
 

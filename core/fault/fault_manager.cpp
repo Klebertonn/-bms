@@ -34,10 +34,20 @@ void FaultManager::setStorageSink(IFaultStorageSink* sink)
 void FaultManager::raiseFault(FaultCode code)
 {
     const FaultSeverity sev = FaultRegistry::findSeverity(code);
-    raiseFault(code, sev, FaultState::ACTIVE);
+    raiseFault(code, sev, FaultState::ACTIVE, FAULT_SOURCE_GLOBAL, 0.0f, 0.0f);
 }
 
 void FaultManager::raiseFault(FaultCode code, FaultSeverity severity, FaultState state)
+{
+    raiseFault(code, severity, state, FAULT_SOURCE_GLOBAL, 0.0f, 0.0f);
+}
+
+void FaultManager::raiseFault(FaultCode code,
+                               FaultSeverity severity,
+                               FaultState state,
+                               std::uint8_t source,
+                               float measuredValue,
+                               float limit)
 {
     if (code == FaultCode::NONE)
     {
@@ -52,6 +62,9 @@ void FaultManager::raiseFault(FaultCode code, FaultSeverity severity, FaultState
         ++existing.occurrence;
         existing.state = state;
         existing.severity = severity;
+        existing.source = source;
+        existing.measuredValue = measuredValue;
+        existing.limit = limit;
         publishToLog(existing);
         persistToStorage(existing);
         return;
@@ -66,6 +79,9 @@ void FaultManager::raiseFault(FaultCode code, FaultSeverity severity, FaultState
         ev.state = state;
         ev.timestamp = 0;           // preenchido pelo sink de log (clock)
         ev.occurrence = 1;
+        ev.source = source;
+        ev.measuredValue = measuredValue;
+        ev.limit = limit;
         ev.setDescription(FaultRegistry::findDescription(code));
         ++activeCount_;
 

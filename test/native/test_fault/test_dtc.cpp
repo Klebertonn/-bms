@@ -4,6 +4,8 @@
 #include "core/fault/fault_registry.h"
 #include "core/fault/fault_sink.h"
 #include "core/battery/battery_pack.h"
+#include "core/protection/protection_manager.h"
+#include "core/protection/protection_types.h"
 
 // ============================================================================
 // Testes unitários — FaultManager (API legada + API DTC)
@@ -314,6 +316,210 @@ void test_registry_string_to_code(void)
     TEST_ASSERT_EQUAL(FaultCode::NONE, FaultRegistry::stringToCode("Does not exist"));
 }
 
+// ---------------------------------------------------------------------------
+// Sprint DTC-02 – Proteção unificada ProtectionManager -> FaultManager -> DTC
+// ---------------------------------------------------------------------------
+
+// Constrói um pack 4 células com tensões customizadas e preenche max/min.
+static BatteryPack makePack4(const float* voltages, float current, float maxTemp, float minTemp)
+{
+    BatteryPack pack;
+
+    for (std::uint8_t i = 0; i < PACK_CELL_COUNT && i < 4u; ++i)
+    {
+        pack.cells[i].voltage = voltages[i];
+        pack.cells[i].valid = true;
+    }
+
+    pack.current = current;
+    pack.maxTemperature = maxTemp;
+    pack.minTemperature = minTemp;
+    pack.averageTemperature = maxTemp;
+
+    pack.maxVoltage = voltages[0];
+    pack.minVoltage = voltages[0];
+    for (std::uint8_t i = 1; i < PACK_CELL_COUNT && i < 4u; ++i)
+    {
+        if (voltages[i] > pack.maxVoltage) pack.maxVoltage = voltages[i];
+        if (voltages[i] < pack.minVoltage) pack.minVoltage = voltages[i];
+    }
+
+    return pack;
+}
+
+// DTC-02.A: ProtectionManager detecta overvoltage e identifica a célula correta
+// (source 1-based) com o valor medido/limite.
+void test_dtc02_protection_cell_overvoltage_source(void)
+{
+    FaultManager fm;
+    fm.init();
+    ProtectionManager pm;
+    pm.init();
+
+    // Célula 3 é a maior (4.30V) -> source deve ser 3
+    const float v[4] = {4.10f, 4.15f, 4.30f, 4.20f};
+    BatteryPack pack = makePack4(v, 0.0f, 25.0f, 25.0f);
+
+    pm.update(pack, fm);
+
+    TEST_ASSERT_TRUE(fm.hasFault(FaultCode::BMS_CELL_OVERVOLTAGE));
+
+    FaultEvent ev;
+    TEST_ASSERT_TRUE(fm.getActiveFault(0, ev));
+    TEST_ASSERT_EQUAL(FaultCode::BMS_CELL_OVERVOLTAGE, ev.code);
+    TEST_ASSERT_EQUAL(FaultState::ACTIVE, ev.state);
+
+    // Célula correta (1-based) que disparou a falha
+    TEST_ASSERT_EQUAL_UINT8(3, ev.source);
+    // Valor medido da célula ofensora
+    TEST_ASSERT_FLOAT_WITHIN(0.001f, 4.30f, ev.measuredValue);
+    // Limite de sobretensão
+    TEST_ASSERT_FLOAT_WITHIN(0.001f, 4.20f, ev.limit);
+}
+
+// DTC-02.B: Normalização -> CLEARED (fault some quando o pack volta ao normal)
+void test_dtc02_protection_normalization_clears_fault(void)
+{
+    FaultManager fm;
+    fm.init();
+    ProtectionManager pm;
+    pm.init();
+
+    const float v[4] = {4.10f, 4.15f, 4.30f, 4.20f};
+    BatteryPack pack = makePack4(v, 0.0f, 25.0f, 25.0f);
+
+    pm.update(pack, fm);
+    TEST_ASSERT_TRUE(fm.hasFault(FaultCode::BMS_CELL_OVERVOLTAGE));
+
+    // Normaliza o pack
+    const float ok[4] = {3.70f, 3.72f, 3.71f, 3.70f};
+    BatteryPack normal = makePack4(ok, 0.0f, 25.0f, 25.0f);
+
+    pm.update(normal, fm);
+
+    TEST_ASSERT_FALSE(fm.hasFault(FaultCode::BMS_CELL_OVERVOLTAGE));
+    TEST_ASSERT_FALSE(fm.hasFault());
+    TEST_ASSERT_EQUAL_UINT32(0, fm.getActiveFaults());
+}
+
+// DTC-02.C: Under voltage com identificação da célula correta
+void test_dtc02_protection_cell_undervoltage_source(void)
+{
+    FaultManager fm;
+    fm.init();
+    ProtectionManager pm;
+    pm.init();
+
+    // Célula 2 é a menor (2.95V) -> source deve ser 2
+    const float v[4] = {3.20f, 2.95f, 3.10f, 3.18f};
+    BatteryPack pack = makePack4(v, 0.0f, 25.0f, 25.0f);
+
+    pm.update(pack, fm);
+
+    TEST_ASSERT_TRUE(fm.hasFault(FaultCode::BMS_CELL_UNDERVOLTAGE));
+
+    FaultEvent ev;
+    TEST_ASSERT_TRUE(fm.getActiveFault(0, ev));
+    TEST_ASSERT_EQUAL(FaultCode::BMS_CELL_UNDERVOLTAGE, ev.code);
+    TEST_ASSERT_EQUAL_UINT8(2, ev.source);
+    TEST_ASSERT_FLOAT_WITHIN(0.001f, 2.95f, ev.measuredValue);
+    TEST_ASSERT_FLOAT_WITHIN(0.001f, 3.00f, ev.limit);
+}
+
+// DTC-02.D: Over temperature
+void test_dtc02_protection_over_temperature(void)
+{
+    FaultManager fm;
+    fm.init();
+    ProtectionManager pm;
+    pm.init();
+
+    const float v[4] = {3.70f, 3.70f, 3.70f, 3.70f};
+    BatteryPack pack = makePack4(v, 0.0f, 65.0f, 65.0f);
+
+    pm.update(pack, fm);
+
+    TEST_ASSERT_TRUE(fm.hasFault(FaultCode::BMS_OVER_TEMPERATURE));
+    TEST_ASSERT_EQUAL(ProtectionState::OVER_TEMPERATURE, pm.getState());
+    TEST_ASSERT_FALSE(pm.chargeEnabled());
+    TEST_ASSERT_FALSE(pm.dischargeEnabled());
+}
+
+// DTC-02.E: Over current protege os MOSFETs
+void test_dtc02_protection_over_current(void)
+{
+    FaultManager fm;
+    fm.init();
+    ProtectionManager pm;
+    pm.init();
+
+    const float v[4] = {3.70f, 3.70f, 3.70f, 3.70f};
+    BatteryPack pack = makePack4(v, 35.0f, 25.0f, 25.0f);
+
+    pm.update(pack, fm);
+
+    TEST_ASSERT_TRUE(fm.hasFault(FaultCode::BMS_OVER_CURRENT));
+    TEST_ASSERT_EQUAL(ProtectionState::OVER_CURRENT_CHARGE, pm.getState());
+    TEST_ASSERT_FALSE(pm.chargeEnabled());
+    TEST_ASSERT_FALSE(pm.dischargeEnabled());
+}
+
+// DTC-02.F: Múltiplas falhas simultâneas (overvoltage + overtemperature)
+void test_dtc02_protection_multiple_simultaneous_faults(void)
+{
+    FaultManager fm;
+    fm.init();
+    ProtectionManager pm;
+    pm.init();
+
+    const float v[4] = {4.25f, 4.10f, 4.10f, 4.20f};
+    BatteryPack pack = makePack4(v, 0.0f, 65.0f, 65.0f);
+
+    pm.update(pack, fm);
+
+    TEST_ASSERT_TRUE(fm.hasFault(FaultCode::BMS_CELL_OVERVOLTAGE));
+    TEST_ASSERT_TRUE(fm.hasFault(FaultCode::BMS_OVER_TEMPERATURE));
+    TEST_ASSERT_EQUAL_UINT32(2, fm.getActiveFaults());
+}
+
+// DTC-02.G: Overvoltage protege MOSFET de carga (charge off, discharge on)
+void test_dtc02_protection_overvoltage_mosfet(void)
+{
+    FaultManager fm;
+    fm.init();
+    ProtectionManager pm;
+    pm.init();
+
+    const float v[4] = {4.10f, 4.15f, 4.30f, 4.20f};
+    BatteryPack pack = makePack4(v, 0.0f, 25.0f, 25.0f);
+
+    pm.update(pack, fm);
+
+    TEST_ASSERT_EQUAL(ProtectionState::OVER_VOLTAGE, pm.getState());
+    TEST_ASSERT_FALSE(pm.chargeEnabled());
+    TEST_ASSERT_TRUE(pm.dischargeEnabled());
+}
+
+// DTC-02.H: Short circuit (corrente 10x limite) -> FATAL, MOSFETs off
+void test_dtc02_protection_short_circuit(void)
+{
+    FaultManager fm;
+    fm.init();
+    ProtectionManager pm;
+    pm.init();
+
+    const float v[4] = {3.70f, 3.70f, 3.70f, 3.70f};
+    BatteryPack pack = makePack4(v, 350.0f, 25.0f, 25.0f);
+
+    pm.update(pack, fm);
+
+    TEST_ASSERT_TRUE(fm.hasFault(FaultCode::BMS_SHORT_CIRCUIT));
+    TEST_ASSERT_TRUE(fm.hasFault(FaultCode::BMS_OVER_CURRENT));
+    TEST_ASSERT_EQUAL(ProtectionState::SHORT_CIRCUIT, pm.getState());
+    TEST_ASSERT_FALSE(pm.chargeEnabled());
+    TEST_ASSERT_FALSE(pm.dischargeEnabled());
+}
+
 int main(int argc, char** argv)
 {
     (void)argc;
@@ -338,10 +544,20 @@ int main(int argc, char** argv)
     RUN_TEST(test_dtc_clear_fault_removes_active);
     RUN_TEST(test_dtc_raise_multiple_distinct_faults);
 
-    // Registry
+// Registry
     RUN_TEST(test_registry_code_to_string);
     RUN_TEST(test_registry_severity);
     RUN_TEST(test_registry_string_to_code);
+
+    // Sprint DTC-02 – Proteção unificada
+    RUN_TEST(test_dtc02_protection_cell_overvoltage_source);
+    RUN_TEST(test_dtc02_protection_normalization_clears_fault);
+    RUN_TEST(test_dtc02_protection_cell_undervoltage_source);
+    RUN_TEST(test_dtc02_protection_over_temperature);
+    RUN_TEST(test_dtc02_protection_over_current);
+    RUN_TEST(test_dtc02_protection_multiple_simultaneous_faults);
+    RUN_TEST(test_dtc02_protection_overvoltage_mosfet);
+    RUN_TEST(test_dtc02_protection_short_circuit);
 
     return UNITY_END();
 }

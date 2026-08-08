@@ -41,7 +41,13 @@ public:
 class FaultStorageSinkAdapter : public IFaultStorageSink
 {
 public:
+    /* Injeta referência ao FaultStorage concreto (camada de aplicação). */
+    void setStorage(FaultStorage* storage);
+
     bool onFaultPersist(const FaultEvent& event) override;
+
+private:
+    FaultStorage* storage_ = nullptr;
 };
 
 /**

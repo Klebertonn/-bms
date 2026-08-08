@@ -49,6 +49,14 @@ public:
     /* Registra uma falha com severidade/estado personalizados. */
     void raiseFault(FaultCode code, FaultSeverity severity, FaultState state);
 
+    /* Registra uma falha com contexto diagnóstico completo (origem, valor e limite). */
+    void raiseFault(FaultCode code,
+                    FaultSeverity severity,
+                    FaultState state,
+                    std::uint8_t source,
+                    float measuredValue,
+                    float limit);
+
     /* Limpa uma falha ativa (marca CLEARED). */
     void clearFault(FaultCode code);
 
