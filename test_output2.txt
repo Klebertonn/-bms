@@ -1,0 +1,4 @@
+Usage: pio test [OPTIONS]
+Try 'pio test -h' for help.
+
+Error: No such option: --clean
