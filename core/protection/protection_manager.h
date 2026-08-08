@@ -8,10 +8,10 @@
 class ProtectionManager
 {
 public:
-    void init();
+void init();
 
-    void update(const BatteryPack& pack,
-                const FaultManager& faults);
+    void update(BatteryPack& pack,
+                FaultManager& faults);
 
 
     ProtectionState getState() const;

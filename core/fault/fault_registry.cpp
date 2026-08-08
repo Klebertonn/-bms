@@ -73,7 +73,7 @@ FaultSeverity FaultRegistry::findSeverity(FaultCode code)
     {
         return FaultSeverity::ERROR;
     }
-    return kFaultTable[idx].defaultSeverity;
+    return kFaultTable[idx].severity;
 }
 
 const char* FaultRegistry::codeToString(FaultCode code)

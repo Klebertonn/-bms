@@ -20,12 +20,20 @@
  * ==========================================================
  */
 
-/* Metadados de um código DTC cadastrado */
+/* Metadados de um código DTC cadastrado
+ *
+ * NOTA: mantido como "aggregate" (sem inicializadores de membro) para
+ * permitir inicialização por lista uniforme mesmo em C++11 estrito.
+ * Campos:
+ *   - code        : código DTC (FaultCode)
+ *   - description : descrição legível da falha
+ *   - severity    : severidade padrão da falha
+ */
 struct FaultMeta
 {
-    FaultCode code = FaultCode::NONE;
-    const char* description = nullptr;
-    FaultSeverity defaultSeverity = FaultSeverity::ERROR;
+    FaultCode code;
+    const char* description;
+    FaultSeverity severity;
 };
 
 class FaultRegistry

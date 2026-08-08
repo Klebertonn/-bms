@@ -34,50 +34,155 @@ void ProtectionManager::init()
 }
 
 void ProtectionManager::update(
-    const BatteryPack& pack,
-    const FaultManager& faults
-)
+    BatteryPack& pack,
+    FaultManager& faults)
 {
-    (void)pack;
+    // =========================================================
+    // 1. Detecção das condições físicas
+    // =========================================================
 
-    // Estado padrão
+    const bool overVoltage =
+        pack.maxVoltage > MAX_CELL_VOLTAGE;
+
+    const bool underVoltage =
+        pack.minVoltage < MIN_CELL_VOLTAGE;
+
+    const bool overTemperature =
+        pack.maxTemperature > MAX_TEMPERATURE;
+
+    const bool underTemperature =
+        pack.minTemperature < MIN_TEMPERATURE;
+
+    const bool overCurrentCharge =
+        pack.current > MAX_CHARGE_CURRENT;
+
+    const bool overCurrentDischarge =
+        pack.current < -MAX_DISCHARGE_CURRENT;
+
+    // =========================================================
+    // 2. Sincronização Protection -> DTC
+    //
+    // IMPORTANTE:
+    // Só chama raiseFault() quando a falha ainda não está ativa.
+    // Isso evita incrementar occurrence a cada ciclo do BMS.
+    // =========================================================
+
+    if (overVoltage)
+    {
+        if (!faults.hasFault(FaultCode::BMS_CELL_OVERVOLTAGE))
+        {
+            faults.raiseFault(FaultCode::BMS_CELL_OVERVOLTAGE);
+        }
+    }
+    else
+    {
+        faults.clearFault(FaultCode::BMS_CELL_OVERVOLTAGE);
+    }
+
+    if (underVoltage)
+    {
+        if (!faults.hasFault(FaultCode::BMS_CELL_UNDERVOLTAGE))
+        {
+            faults.raiseFault(FaultCode::BMS_CELL_UNDERVOLTAGE);
+        }
+    }
+    else
+    {
+        faults.clearFault(FaultCode::BMS_CELL_UNDERVOLTAGE);
+    }
+
+    if (overTemperature)
+    {
+        if (!faults.hasFault(FaultCode::BMS_OVER_TEMPERATURE))
+        {
+            faults.raiseFault(FaultCode::BMS_OVER_TEMPERATURE);
+        }
+    }
+    else
+    {
+        faults.clearFault(FaultCode::BMS_OVER_TEMPERATURE);
+    }
+
+    if (underTemperature)
+    {
+        if (!faults.hasFault(FaultCode::BMS_LOW_TEMPERATURE))
+        {
+            faults.raiseFault(FaultCode::BMS_LOW_TEMPERATURE);
+        }
+    }
+    else
+    {
+        faults.clearFault(FaultCode::BMS_LOW_TEMPERATURE);
+    }
+
+    if (overCurrentCharge || overCurrentDischarge)
+    {
+        if (!faults.hasFault(FaultCode::BMS_OVER_CURRENT))
+        {
+            faults.raiseFault(FaultCode::BMS_OVER_CURRENT);
+        }
+    }
+    else
+    {
+        faults.clearFault(FaultCode::BMS_OVER_CURRENT);
+    }
+
+    // =========================================================
+    // 3. Estado de proteção
+    // Prioridade:
+    // OV > UV > temperatura > corrente
+    // =========================================================
+
     chargeMosfet = true;
     dischargeMosfet = true;
     state = ProtectionState::NORMAL;
 
-    // Interpretação por falha (prioridade: primeira que casar)
-    if (faults.hasFault(FAULT_CELL_OVERVOLTAGE))
+    if (faults.hasFault(FaultCode::BMS_CELL_OVERVOLTAGE))
     {
         state = ProtectionState::OVER_VOLTAGE;
+
         chargeMosfet = false;
         dischargeMosfet = true;
         return;
     }
 
-    if (faults.hasFault(FAULT_CELL_UNDERVOLTAGE))
+    if (faults.hasFault(FaultCode::BMS_CELL_UNDERVOLTAGE))
     {
         state = ProtectionState::UNDER_VOLTAGE;
+
         chargeMosfet = true;
         dischargeMosfet = false;
         return;
     }
 
-    if (faults.hasFault(FAULT_OVER_TEMPERATURE))
+    if (faults.hasFault(FaultCode::BMS_OVER_TEMPERATURE))
     {
         state = ProtectionState::OVER_TEMPERATURE;
+
         chargeMosfet = false;
         dischargeMosfet = false;
         return;
     }
 
-    if (faults.hasFault(FAULT_OVER_CURRENT))
+    if (faults.hasFault(FaultCode::BMS_LOW_TEMPERATURE))
     {
-        state = ProtectionState::OVER_CURRENT_DISCHARGE;
+        state = ProtectionState::UNDER_TEMPERATURE;
+
         chargeMosfet = false;
         dischargeMosfet = false;
         return;
     }
 
+    if (faults.hasFault(FaultCode::BMS_OVER_CURRENT))
+    {
+        state = overCurrentCharge
+                    ? ProtectionState::OVER_CURRENT_CHARGE
+                    : ProtectionState::OVER_CURRENT_DISCHARGE;
+
+        chargeMosfet = false;
+        dischargeMosfet = false;
+        return;
+    }
 }
 
 

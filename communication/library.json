@@ -1,0 +1,9 @@
+{
+    "name": "bms-communication",
+    "version": "1.0.0",
+    "description": "BMS communication modules (CAN, BLE, fault protocol).",
+    "keywords": ["bms", "communication", "can", "ble"],
+    "build": {
+        "srcDir": "."
+    }
+}
