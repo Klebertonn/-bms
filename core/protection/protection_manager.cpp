@@ -35,7 +35,7 @@ static std::uint8_t findMaxCellSource(const BatteryPack& pack)
     std::uint8_t best = FAULT_SOURCE_GLOBAL;
     for (std::uint8_t i = 0; i < PACK_CELL_COUNT; ++i)
     {
-        if (pack.cells[i].valid && pack.cells[i].voltage > maxV)
+        if (pack.cells[i].voltage > maxV)
         {
             maxV = pack.cells[i].voltage;
             best = static_cast<std::uint8_t>(i + 1u); // 1-based

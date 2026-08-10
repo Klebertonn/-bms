@@ -3,6 +3,7 @@
 #include <limits>
 
 #include "fault_registry.h"
+#include "../../system/clock/clock.h"
 
 void FaultManager::init()
 {
@@ -77,7 +78,7 @@ void FaultManager::raiseFault(FaultCode code,
         ev.code = code;
         ev.severity = severity;
         ev.state = state;
-        ev.timestamp = 0;           // preenchido pelo sink de log (clock)
+        ev.timestamp = static_cast<std::uint32_t>(Clock::millis());
         ev.occurrence = 1;
         ev.source = source;
         ev.measuredValue = measuredValue;
