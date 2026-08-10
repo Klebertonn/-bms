@@ -88,6 +88,92 @@ function renderMetrics(data) {
 }
 
 /**
+ * Renderiza as células do pack.
+ */
+function renderCells(data) {
+    const grid = document.getElementById('cellsGrid');
+    if (!grid) return;
+
+    const cells = data.cells || [];
+    let html = '';
+
+    cells.forEach((cell, i) => {
+        const isOver = cell.voltage > 4.25;
+        const isUnder = cell.voltage < 3.00;
+        const statusClass = isOver ? 'cell--over' : isUnder ? 'cell--under' : 'cell--ok';
+        const statusText = isOver ? 'SOBRETENSÃO' : isUnder ? 'SUBTENSÃO' : 'OK';
+
+        html += `
+            <div class="cell-item ${statusClass}">
+                <span class="cell__label">Cell ${i + 1}</span>
+                <span class="cell__voltage">${cell.voltage.toFixed(3)} V</span>
+                <span class="cell__status">${statusText}</span>
+            </div>`;
+    });
+
+    // Min / Max / Delta
+    html += `
+        <div class="cell-item cell--info">
+            <span class="cell__label">Menor</span>
+            <span class="cell__voltage">${data.minCell.toFixed(3)} V</span>
+            <span class="cell__status">MIN</span>
+        </div>
+        <div class="cell-item cell--info">
+            <span class="cell__label">Maior</span>
+            <span class="cell__voltage">${data.maxCell.toFixed(3)} V</span>
+            <span class="cell__status">MAX</span>
+        </div>
+        <div class="cell-item cell--info">
+            <span class="cell__label">Delta</span>
+            <span class="cell__voltage">${(data.cellDelta * 1000).toFixed(0)} mV</span>
+            <span class="cell__status">ΔV</span>
+        </div>`;
+
+    grid.innerHTML = html;
+}
+
+/**
+ * Renderiza o estado dos MOSFETs.
+ */
+function renderMosfet(data) {
+    const mosfet = data.mosfet || {};
+
+    const setMosfet = (id, enabled) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const status = el.querySelector('.mosfet__status');
+        status.textContent = enabled ? 'ON' : 'OFF';
+        status.className = 'mosfet__status ' + (enabled ? 'mosfet__status--on' : 'mosfet__status--off');
+    };
+
+    setMosfet('mosfetCharge', mosfet.charge);
+    setMosfet('mosfetDischarge', mosfet.discharge);
+    setMosfet('mosfetBalance', mosfet.balance);
+}
+
+/**
+ * Renderiza as informações do sistema.
+ */
+function renderSystem(data) {
+    const sys = data.system || {};
+
+    // Uptime formatado
+    const uptimeMs = sys.uptimeMs || 0;
+    const secs = Math.floor(uptimeMs / 1000);
+    const h = Math.floor(secs / 3600);
+    const m = Math.floor((secs % 3600) / 60);
+    const s = secs % 60;
+    const uptimeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+
+    document.getElementById('sysUptime').textContent = uptimeStr;
+    document.getElementById('sysLoops').textContent = (sys.loops || 0).toLocaleString('pt-BR');
+    document.getElementById('sysHeartbeat').textContent = sys.heartbeat ? 'ALIVE' : 'DEAD';
+    document.getElementById('sysHeartbeat').style.color =
+        sys.heartbeat ? 'var(--color-success)' : 'var(--color-danger)';
+    document.getElementById('sysFaults').textContent = sys.faultCount || 0;
+}
+
+/**
  * Atualiza o cartão de fault ativa.
  */
 function renderFault(data) {
@@ -99,7 +185,8 @@ function renderFault(data) {
         valueEl.textContent = f.name || 'FALHA';
         valueEl.style.color = 'var(--color-danger)';
         infoEl.textContent =
-            `Cód 0x${(f.code || 0).toString(16).padStart(4, '0')} · Célula ${f.cell === 0xFF ? 'Pack' : f.cell} · ` +
+            `Cód 0x${(f.code || 0).toString(16).padStart(4, '0')} · Sev ${f.severity || '—'} · ` +
+            `Célula ${f.cell === 0xFF ? 'Pack' : f.cell} · ` +
             `${f.value != null ? f.value : '—'} / ${f.limit != null ? f.limit : '—'}`;
     } else {
         valueEl.textContent = 'Nenhuma';
@@ -170,6 +257,9 @@ function onData(data, history, heartbeat) {
     renderHeartbeat(heartbeat);
     renderState(data);
     renderMetrics(data);
+    renderCells(data);
+    renderMosfet(data);
+    renderSystem(data);
     renderFault(data);
     renderHistory(history || []);
     renderTable(data);

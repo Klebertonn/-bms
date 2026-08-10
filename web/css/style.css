@@ -296,6 +296,148 @@ body {
     padding: 2rem !important;
 }
 
+/* ---------- Células ---------- */
+.cells-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+}
+
+.cell-item {
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+}
+
+.cell-item.cell--over {
+    border-color: var(--color-danger);
+    background: rgba(248, 113, 113, 0.1);
+}
+
+.cell-item.cell--under {
+    border-color: var(--color-warning);
+    background: rgba(251, 191, 36, 0.1);
+}
+
+.cell-item.cell--ok {
+    border-color: var(--color-success);
+}
+
+.cell-item.cell--info {
+    border-color: var(--color-primary);
+    background: rgba(56, 189, 248, 0.05);
+}
+
+.cell__label {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.cell__voltage {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.cell__status {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    background: var(--color-surface);
+    color: var(--color-muted);
+}
+
+.cell--over .cell__status {
+    color: var(--color-danger);
+}
+
+.cell--under .cell__status {
+    color: var(--color-warning);
+}
+
+.cell--ok .cell__status {
+    color: var(--color-success);
+}
+
+/* ---------- MOSFET ---------- */
+.mosfet-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.mosfet-item {
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.mosfet__label {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.mosfet__status {
+    font-size: 1.2rem;
+    font-weight: 700;
+    padding: 0.35rem 1rem;
+    border-radius: 999px;
+}
+
+.mosfet__status--on {
+    background: var(--color-success);
+    color: #0f172a;
+}
+
+.mosfet__status--off {
+    background: var(--color-surface);
+    color: var(--color-muted);
+}
+
+/* ---------- Sistema ---------- */
+.system-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.system-item {
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.system__label {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.system__value {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
 /* ---------- Footer ---------- */
 .footer {
     display: flex;

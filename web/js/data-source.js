@@ -3,7 +3,8 @@
  * ==========================================================
  * Abstrai a origem dos dados do BMS.
  *
- * Modo 1 (padrão): DEMO — gera dados simulados realistas.
+ * Modo 1 (padrão): DEMO — gera dados simulados realistas
+ *                     (espelha o comportamento do BMS native).
  * Modo 2 (produção): API — busca em endpoint/WebSocket conectado
  *                     ao BMS real (ex.: ESP32 via HTTP/WebSocket).
  *
@@ -26,6 +27,8 @@ const BMSState = {
     listeners: [],
     timerApi: null,
     timerDemo: null,
+    startTime: Date.now(),
+    loopCount: 0,
 };
 
 /**
@@ -50,46 +53,88 @@ function notifyBMSData() {
 
 /**
  * Gera um snapshot de dados simulados (demo).
+ * Espelha o comportamento do BMS native:
+ *   - 3 células: 4.30V / 4.18V / 4.19V (célula 0 em sobretensão)
+ *   - Corrente: 2.35A
+ *   - Temperatura: 25°C
+ *   - SOC: 100% (tensão do pack acima do full)
+ *   - SOH: 100%
+ *   - Falha: Cell over voltage (DTC 0x0101)
+ *   - MOSFET: Charge OFF, Discharge ON, Balance OFF
  */
 function generateDemoData() {
     const now = Date.now();
-    const t = now / 1000;
+    const uptimeMs = now - BMSState.startTime;
+    BMSState.loopCount += 10; // ~10 loops por segundo (100ms cada)
 
-    const soc = Math.round(78 + Math.sin(t / 30) * 3);
-    const soh = 96;
-    const packVoltage = 12.4 + Math.sin(t / 20) * 0.3;
-    const current = 2.1 + Math.sin(t / 15) * 1.2;
-    const temp = 26.5 + Math.sin(t / 25) * 0.8;
+    // Células (mock do BMS native)
+    const cells = [
+        { voltage: 4.30, valid: false },  // Sobretensão
+        { voltage: 4.18, valid: true },
+        { voltage: 4.19, valid: true },
+    ];
+
+    const packVoltage = cells.reduce((s, c) => s + c.voltage, 0);
+    const minVoltage = Math.min(...cells.map(c => c.voltage));
+    const maxVoltage = Math.max(...cells.map(c => c.voltage));
+    const deltaVoltage = maxVoltage - minVoltage;
+
+    const current = 2.35;
+    const temperature = 25.0;
+    const soc = 100;
+    const soh = 100;
+
+    // Falha ativa: Cell over voltage (célula 0)
+    const faultActive = true;
+    const fault = {
+        active: faultActive,
+        name: 'CELL_OVERVOLTAGE',
+        code: 0x0101,
+        severity: 'CRITICAL',
+        cell: 1, // célula 1 (1-based)
+        value: 4.30,
+        limit: 4.25,
+    };
 
     return {
-        state: 'charging',
+        state: 'ready',
         valid: true,
-        charging: true,
-        discharging: false,
-        balancing: soc > 80,
+        charging: false,
+        discharging: true,
+        balancing: false,
 
         soc,
         soh,
         packVoltage,
         packCurrent: current,
         packPower: packVoltage * current,
-        packDelta: 0.035,
+        packDelta: deltaVoltage,
 
-        temperature: temp,
-        tempMin: temp - 0.6,
-        tempMax: temp + 0.6,
+        cells,
+        minCell: minVoltage,
+        maxCell: maxVoltage,
+        cellDelta: deltaVoltage,
 
-        fault: {
-            active: current > 25,
-            name: current > 25 ? 'OVERCURRENT' : 'Nenhuma',
-            code: current > 25 ? 0x0104 : 0x0000,
-            cell: 0xFF,
-            value: current,
-            limit: 30.0,
+        temperature,
+        tempMin: temperature,
+        tempMax: temperature,
+
+        mosfet: {
+            charge: false,
+            discharge: true,
+            balance: false,
+        },
+
+        fault,
+
+        system: {
+            uptimeMs,
+            loops: BMSState.loopCount,
+            heartbeat: true,
+            faultCount: 1,
         },
 
         timestamp: now,
-        uptime: Math.round(now / 1000),
     };
 }
 
@@ -98,9 +143,9 @@ function generateDemoData() {
  */
 function createDemoFault(timestamp, index) {
     const faults = [
-        { name: 'CELL_OVERVOLTAGE', code: 0x0101, cell: 0, value: 4.31, limit: 4.25 },
-        { name: 'OVERTEMPERATURE', code: 0x0103, cell: 0xFF, value: 63.0, limit: 60.0 },
-        { name: 'UNDERVOLTAGE', code: 0x0102, cell: 1, value: 2.95, limit: 3.00 },
+        { name: 'CELL_OVERVOLTAGE', code: 0x0101, cell: 1, value: 4.30, limit: 4.25, severity: 'CRITICAL' },
+        { name: 'OVERTEMPERATURE', code: 0x0103, cell: 0xFF, value: 63.0, limit: 60.0, severity: 'CRITICAL' },
+        { name: 'UNDERVOLTAGE', code: 0x0102, cell: 2, value: 2.95, limit: 3.00, severity: 'CRITICAL' },
     ];
     const f = faults[index % faults.length];
     return {
@@ -111,6 +156,7 @@ function createDemoFault(timestamp, index) {
         cell: f.cell,
         value: f.value,
         limit: f.limit,
+        severity: f.severity,
     };
 }
 

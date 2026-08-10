@@ -91,6 +91,56 @@
 
         </div>
 
+        <!-- Células -->
+        <section class="card card--wide">
+            <h2 class="card__title">Células</h2>
+            <div class="cells-grid" id="cellsGrid">
+                <!-- Renderizado via JS -->
+            </div>
+        </section>
+
+        <!-- MOSFET -->
+        <section class="card card--wide">
+            <h2 class="card__title">MOSFET</h2>
+            <div class="mosfet-grid">
+                <div class="mosfet-item" id="mosfetCharge">
+                    <span class="mosfet__label">Charge</span>
+                    <span class="mosfet__status mosfet__status--off">OFF</span>
+                </div>
+                <div class="mosfet-item" id="mosfetDischarge">
+                    <span class="mosfet__label">Discharge</span>
+                    <span class="mosfet__status mosfet__status--off">OFF</span>
+                </div>
+                <div class="mosfet-item" id="mosfetBalance">
+                    <span class="mosfet__label">Balance</span>
+                    <span class="mosfet__status mosfet__status--off">OFF</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sistema -->
+        <section class="card card--wide">
+            <h2 class="card__title">Sistema</h2>
+            <div class="system-grid">
+                <div class="system-item">
+                    <span class="system__label">Uptime</span>
+                    <span class="system__value" id="sysUptime">—</span>
+                </div>
+                <div class="system-item">
+                    <span class="system__label">Loops</span>
+                    <span class="system__value" id="sysLoops">—</span>
+                </div>
+                <div class="system-item">
+                    <span class="system__label">Heartbeat</span>
+                    <span class="system__value" id="sysHeartbeat">—</span>
+                </div>
+                <div class="system-item">
+                    <span class="system__label">Falhas</span>
+                    <span class="system__value" id="sysFaults">—</span>
+                </div>
+            </div>
+        </section>
+
         <!-- Gráficos -->
         <div class="grid grid--col-2">
             <section class="card card--wide">
@@ -163,4 +213,3 @@
     <script src="js/dashboard.js"></script>
 </body>
 </html>
-

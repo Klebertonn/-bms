@@ -214,6 +214,11 @@ void App::printFaultHistory()
 
 void App::update()
 {
+    // Contadores para status periódico (5 s)
+    static std::uint64_t lastStatusMs = 0;
+    static std::uint64_t loopCount = 0;
+    ++loopCount;
+
     //-------------------------------------------------
     // Battery
     //-------------------------------------------------
@@ -296,7 +301,51 @@ void App::update()
     // ProtectionManager continua existindo para gerar falhas e flags, mas não sobrescreve MOSFETs.
     (void)balance_.getStatus();
 
-    printTelemetry(pack);
+    //-------------------------------------------------
+    // Status periódico (a cada 5 s)
+    //-------------------------------------------------
+
+    const std::uint64_t nowMs = Clock::millis();
+    if ((nowMs - lastStatusMs) >= 5000)
+    {
+        lastStatusMs = nowMs;
+
+        printf("\n");
+        printf("=============== BMS STATUS ===============\n");
+        printf("UPTIME       : %llu ms\n", static_cast<unsigned long long>(nowMs));
+        printf("LOOPS        : %llu\n", static_cast<unsigned long long>(loopCount));
+        printf("STATE        : %s\n", bmsStateMachine_.toString());
+        printf("PACK VOLTAGE : %.2f V\n", pack.totalVoltage);
+        printf("MIN CELL     : %.3f V\n", pack.minVoltage);
+        printf("MAX CELL     : %.3f V\n", pack.maxVoltage);
+        printf("CELL DELTA   : %.0f mV\n", pack.deltaVoltage * 1000.0f);
+        printf("CURRENT      : %.2f A\n", pack.current);
+        printf("TEMPERATURE  : %.1f C\n", pack.averageTemperature);
+        printf("SOC          : %u %%\n", static_cast<unsigned>(pack.soc));
+        printf("SOH          : %u %%\n", static_cast<unsigned>(pack.soh));
+
+        // Falhas ativas (DTC)
+        const std::size_t activeFaults = fault_.getActiveFaults();
+        printf("ACTIVE FAULTS: %u\n", static_cast<unsigned>(activeFaults));
+        for (std::size_t i = 0; i < activeFaults; ++i)
+        {
+            FaultEvent ev;
+            if (fault_.getActiveFault(i, ev))
+            {
+                printf("  - %s\n", FaultRegistry::codeToString(ev.code));
+            }
+        }
+
+        // Heartbeat
+        const HeartbeatData& hb = heartbeat_.data();
+        printf("HEARTBEAT    : ALIVE=%s UPTIME=%u ms SOC=%u%% TEMP=%.1f C\n",
+               hb.alive ? "YES" : "NO",
+               static_cast<unsigned>(hb.uptimeMs),
+               static_cast<unsigned>(hb.soc),
+               hb.temperatureC);
+
+        printf("==========================================\n\n");
+    }
 
     //-------------------------------------------------
     // Telemetria industrial de falhas
@@ -428,7 +477,11 @@ void App::update()
     );
 
     // Sprint 3.2 — Exibir Fault History (após status industrial)
-    printFaultHistory();
+    // Apenas a cada 5 s para não poluir o console.
+    if ((nowMs - lastStatusMs) < 100)
+    {
+        printFaultHistory();
+    }
 
     //-------------------------------------------------
     // Heartbeat (Sprint Heartbeat)
