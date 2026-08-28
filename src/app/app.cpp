@@ -30,9 +30,6 @@ void FaultStorageSinkAdapter::setStorage(FaultStorage* storage)
 
 bool FaultStorageSinkAdapter::onFaultPersist(const FaultEvent& event)
 {
-    // Persiste o evento DTC no backend real (FaultStorage).
-    // O FaultStorage é injetado pela camada de aplicação; o domínio
-    // (FaultManager) não conhece a implementação concreta.
     if (storage_ == nullptr)
     {
         return false;
@@ -75,6 +72,25 @@ static const char* protectionStateToString(ProtectionState state)
         case ProtectionState::UNKNOWN:
         default:
             return "UNKNOWN";
+    }
+}
+
+/* ==========================================================
+ * Mapeamento FaultCode (DTC) -> FaultReason (legado) + código 0x????.
+ * Tabela mínima para as falhas detectadas pelo ProtectionManager.
+ * ========================================================== */
+static FaultReason faultCodeToReason(FaultCode code, std::uint16_t& outCode)
+{
+    switch (code)
+    {
+        case FaultCode::BMS_CELL_OVERVOLTAGE:   outCode = 0x0101; return FaultReason::CELL_OVERVOLTAGE;
+        case FaultCode::BMS_CELL_UNDERVOLTAGE:  outCode = 0x0102; return FaultReason::CELL_UNDERVOLTAGE;
+        case FaultCode::BMS_OVER_TEMPERATURE:   outCode = 0x0201; return FaultReason::OVERTEMPERATURE;
+        case FaultCode::BMS_LOW_TEMPERATURE:    outCode = 0x0202; return FaultReason::UNDERTEMPERATURE;
+        case FaultCode::BMS_OVER_CURRENT:       outCode = 0x0301; return FaultReason::OVERCURRENT_CHARGE;
+        case FaultCode::BMS_SHORT_CIRCUIT:      outCode = 0x0302; return FaultReason::OVERCURRENT_DISCHARGE;
+        case FaultCode::BMS_SENSOR_FAILURE:     outCode = 0x0401; return FaultReason::SENSOR_FAILURE;
+        default:                                 outCode = 0x0000; return FaultReason::NONE;
     }
 }
 
@@ -124,9 +140,6 @@ void App::setMosfetDriver(IMosfetDriver* driver)
 
 bool App::init()
 {
-    // Inicializa o FaultManager e injeta os adaptadores de saída (Dependency Injection).
-    // O FaultManager (core) não conhece Logger/Storage; recebe abstrações
-    // IFaultLogSink e IFaultStorageSink compostas aqui na camada de aplicação.
     fault_.init();
     fault_.setLogSink(&faultLogSink_);
     faultStorageSink_.setStorage(&faultStorage_);
@@ -134,12 +147,8 @@ bool App::init()
 
     printf("Loading Fault History...\n");
 
-faultStorage_.init();
+    faultStorage_.init();
 
-    // Política industrial: NÃO limpar o histórico automaticamente no boot.
-    // Carregamos o histórico persistido e o restauramos na FaultHistory (RAM).
-    // Se a demonstração native precisar de um boot limpo, use
-    // CLEAR_FAULT_HISTORY_ON_BOOT = true (comportamento explícito e configurável).
     constexpr bool CLEAR_FAULT_HISTORY_ON_BOOT = false;
     if (CLEAR_FAULT_HISTORY_ON_BOOT)
     {
@@ -148,7 +157,6 @@ faultStorage_.init();
 
     std::vector<FaultInfo> persistedHistory;
     faultStorage_.load(persistedHistory);
-
 
     for (const auto& fault : persistedHistory)
     {
@@ -165,7 +173,6 @@ faultStorage_.init();
         printf("Events found: %u\n", static_cast<unsigned>(persistedHistory.size()));
     }
 
-    // Inicializa o driver de MOSFET (mock por padrão, ou HAL real no esp32dev).
     mosfetDriver_->init();
 
     battery_.init();
@@ -236,7 +243,6 @@ void App::update()
     CurrentData currentData = current_.getData();
 
     battery_.setCurrent(currentData.currentA);
-    // Mantém potência do pack consistente com a corrente atual.
     pack.current = currentData.currentA;
     pack.power = pack.totalVoltage * pack.current;
 
@@ -248,31 +254,18 @@ void App::update()
 
     TemperatureData temperatureData = temperature_.getData();
 
-    // Atualiza temperaturas no estado compartilhado do BatteryPack
-    // Temporariamente, caso ainda não exista temperatura média real no TemperatureData,
-    // copiamos maxTemperature para todos os campos.
     pack.averageTemperature = temperatureData.averageTemperature;
     pack.maxTemperature = temperatureData.maxTemperature;
     pack.minTemperature = temperatureData.minTemperature;
 
-//-------------------------------------------------
+    //-------------------------------------------------
     // Fault / Protection
     //-------------------------------------------------
-
-    // LEGACY COMPATIBILITY ONLY:
-    // fault_.evaluate(pack) está desabilitado como mecanismo primário.
-    // A detecção agora é centralizada no ProtectionManager, que chama
-    // fault_.raiseFault()/clearFault() para gerar os DTCs.
-    // Manter evaluate() desabilitado evita duplicação de DTC entre os
-    // dois caminhos de detecção (legado FaultFlag vs novo DTC).
-    //
-    // fault_.evaluate(pack);
 
     protection_.update(pack, fault_);
 
     //-------------------------------------------------
-    // BMS State Machine (Sprint 5.2 — Passo 2)
-    // A máquina ainda NÃO controla MOSFET; apenas informa seu estado.
+    // BMS State Machine
     //-------------------------------------------------
 
     bmsStateMachine_.update();
@@ -283,22 +276,17 @@ void App::update()
 
     stateManager_.update(pack, fault_);
 
-    // MOSFET é uma ação derivada do estado: State → MOSFET → Telemetria
     mosfetDriver_->applyState(stateManager_.getState());
 
-    // Telemetria lê o estado real dos MOSFETs
     pack.charging = mosfetDriver_->chargeEnabled();
     pack.discharging = mosfetDriver_->dischargeEnabled();
     pack.balancing = mosfetDriver_->balanceEnabled();
 
     //-------------------------------------------------
-    // Balance (futuro: integrar ao MosfetController)
+    // Balance
     //-------------------------------------------------
 
     balance_.update(pack, protection_, battery_);
-
-    // Para o v1.0 industrial, a camada de MosfetController é a fonte de verdade.
-    // ProtectionManager continua existindo para gerar falhas e flags, mas não sobrescreve MOSFETs.
     (void)balance_.getStatus();
 
     //-------------------------------------------------
@@ -348,84 +336,95 @@ void App::update()
     }
 
     //-------------------------------------------------
-    // Telemetria industrial de falhas
+    // Edge detection DTC -> FaultHistory + FaultStorage
     //-------------------------------------------------
 
-    const FaultInfo& fi = fault_.getFaultInfo();
+    static std::size_t lastActiveCount = 0;
+    const std::size_t activeCount = fault_.getActiveFaults();
 
-    // Push fault history only when we detect a NEW event
-    const bool newEvent =
-        (fi.active != lastFaultActive_) ||
-        (fi.reason != lastFaultReason_) ||
-        (fi.code != lastFaultCode_) ||
-        (fi.source != lastFaultSource_);
-
-    // Edge detection para gravação no FaultStorage
-    static bool faultAlreadySaved = false;
-
-    if (newEvent && fi.active && !faultAlreadySaved)
+    if (activeCount > lastActiveCount)
     {
-        FaultInfo snapshot = fi;
-        snapshot.timestamp = static_cast<std::uint32_t>(Clock::millis());
-
-        // Deduplicação: percorre o faultHistory_ (já carregado no init) e evita append
-        // se já existir entry com code+reason+source.
-        bool alreadyExists = false;
-        const size_t n = faultHistory_.size();
-        for (size_t i = 0; i < n; ++i)
+        // Nova falha detectada — pega o primeiro evento ativo
+        FaultEvent ev;
+        if (fault_.getActiveFault(0, ev))
         {
-            const FaultInfo& prev = faultHistory_.at(i);
-            if (prev.code == snapshot.code && prev.reason == snapshot.reason && prev.source == snapshot.source)
+            std::uint16_t legacyCode = 0;
+            const FaultReason reason = faultCodeToReason(ev.code, legacyCode);
+
+            FaultInfo snapshot;
+            snapshot.active = true;
+            snapshot.reason = reason;
+            snapshot.code = legacyCode;
+            snapshot.source = ev.source;
+            snapshot.value = ev.measuredValue;
+            snapshot.limit = ev.limit;
+            snapshot.timestamp = ev.timestamp;
+
+            // Deduplicação
+            bool alreadyExists = false;
+            const size_t n = faultHistory_.size();
+            for (size_t i = 0; i < n; ++i)
             {
-                alreadyExists = true;
-                break;
+                const FaultInfo& prev = faultHistory_.at(i);
+                if (prev.code == snapshot.code && prev.reason == snapshot.reason && prev.source == snapshot.source)
+                {
+                    alreadyExists = true;
+                    break;
+                }
             }
-        }
 
-        if (!alreadyExists)
+            if (!alreadyExists)
+            {
+                faultHistory_.push(snapshot);
+                faultStorage_.append(snapshot);
+                printf("[STORAGE] Fault persisted.\n");
+            }
+
+            lastFaultActive_ = true;
+            lastFaultReason_ = reason;
+            lastFaultCode_ = legacyCode;
+            lastFaultSource_ = ev.source;
+        }
+    }
+    else if (activeCount == 0 && lastActiveCount > 0)
+    {
+        // Todas as falhas foram limpas
+        lastFaultActive_ = false;
+        lastFaultReason_ = FaultReason::NONE;
+        lastFaultCode_ = 0;
+        lastFaultSource_ = 0xFF;
+    }
+
+    lastActiveCount = activeCount;
+
+    //-------------------------------------------------
+    // BMS INDUSTRIAL (exibição quando há falha ativa)
+    //-------------------------------------------------
+
+    if (activeCount > 0)
+    {
+        FaultEvent fe;
+        if (fault_.getActiveFault(0, fe))
         {
-            faultHistory_.push(snapshot);
-            faultStorage_.append(snapshot);
+            std::uint16_t legacyCode = 0;
+            const FaultReason reason = faultCodeToReason(fe.code, legacyCode);
 
-            printf("[STORAGE] Fault persisted.\n");
+            printf("\n=============== BMS INDUSTRIAL ===============\n");
+            printf("STATE MACHINE : %s\n", bmsStateMachine_.toString());
+            printf("STATE         : %s\n\n", stateManager_.toString());
+
+            printf("FAULT CODE   : 0x%04X\n", legacyCode);
+            printf("FAULT NAME   : %s\n", faultReasonToString(reason));
+            printf("SOURCE CELL  : %u\n", static_cast<unsigned>(fe.source));
+            printf("MEASURED     : %.3f V\n", fe.measuredValue);
+            printf("LIMIT        : %.3f V\n\n", fe.limit);
+
+            printf("ACTION\n");
+            printf(" CHARGE MOSFET      %s\n", mosfetDriver_->chargeEnabled() ? "ON" : "OFF");
+            printf(" DISCHARGE MOSFET   %s\n", mosfetDriver_->dischargeEnabled() ? "ON" : "OFF");
+            printf(" BALANCE            %s\n", mosfetDriver_->balanceEnabled() ? "ON" : "OFF");
+            printf("==============================================\n\n");
         }
-
-        // Mesmo que seja duplicata, marcamos como salvo para não reavaliar no mesmo active.
-        faultAlreadySaved = true;
-
-        lastFaultActive_ = fi.active;
-        lastFaultReason_ = fi.reason;
-        lastFaultCode_ = fi.code;
-        lastFaultSource_ = fi.source;
-    }
-    else if (!fi.active)
-    {
-        faultAlreadySaved = false;
-
-        // mantém atualização dos last* para nova detecção
-        lastFaultActive_ = fi.active;
-        lastFaultReason_ = fi.reason;
-        lastFaultCode_ = fi.code;
-        lastFaultSource_ = fi.source;
-    }
-
-    if (fi.active)
-    {
-        printf("\n=============== BMS INDUSTRIAL ===============\n");
-        printf("STATE MACHINE : %s\n", bmsStateMachine_.toString());
-        printf("STATE         : %s\n\n", stateManager_.toString());
-
-        printf("FAULT CODE   : 0x%04X\n", fi.code);
-        printf("FAULT NAME   : %s\n", faultReasonToString(fi.reason));
-        printf("SOURCE CELL  : %u\n", static_cast<unsigned>(fi.source));
-        printf("MEASURED     : %.3f V\n", fi.value);
-        printf("LIMIT        : %.3f V\n\n", fi.limit);
-
-        printf("ACTION\n");
-        printf(" CHARGE MOSFET      %s\n", mosfetDriver_->chargeEnabled() ? "ON" : "OFF");
-        printf(" DISCHARGE MOSFET   %s\n", mosfetDriver_->dischargeEnabled() ? "ON" : "OFF");
-        printf(" BALANCE            %s\n", mosfetDriver_->balanceEnabled() ? "ON" : "OFF");
-        printf("==============================================\n\n");
     }
 
     //-------------------------------------------------
@@ -434,7 +433,6 @@ void App::update()
 
     char protectionLog[200];
 
-    // Log do State Machine (BMS)
     const char* bmsStateStr = "IDLE";
 
     switch (stateManager_.getState())
@@ -476,16 +474,14 @@ void App::update()
         protection_.dischargeEnabled() ? "ON" : "OFF"
     );
 
-    // Sprint 3.2 — Exibir Fault History (após status industrial)
-    // Apenas a cada 5 s para não poluir o console.
+    // Fault History (a cada 5 s)
     if ((nowMs - lastStatusMs) < 100)
     {
         printFaultHistory();
     }
 
     //-------------------------------------------------
-    // Heartbeat (Sprint Heartbeat)
-    // Alimenta dados (estado, SOC, temperatura) e emite a cada 1000 ms.
+    // Heartbeat
     //-------------------------------------------------
 
     heartbeat_.setState(bmsStateMachine_.toString());

@@ -91,7 +91,7 @@ void test_storage_init_saves_defaults(void)
 {
     g_load_ok = false;
 
-    StorageManager sm;
+    StorageManager sm(&driver);
     sm.init();
 
     StorageData& d = sm.data();
@@ -106,7 +106,7 @@ void test_storage_init_saves_defaults(void)
 
 void test_storage_save_then_load_roundtrip(void)
 {
-    StorageManager sm;
+    StorageManager sm(&driver);
     sm.init();
 
     StorageData& d = sm.data();
@@ -116,8 +116,7 @@ void test_storage_save_then_load_roundtrip(void)
 
     TEST_ASSERT_TRUE(sm.save());
 
-    g_load_ok = true;
-    StorageManager sm2;
+    StorageManager sm2(&driver);
     TEST_ASSERT_TRUE(sm2.load());
 
     StorageData& loaded = sm2.data();
@@ -133,7 +132,7 @@ void test_storage_load_defaults_when_invalid(void)
     g_storage.version = 0;
     g_storage.crc = 0xBAD;
 
-    StorageManager sm;
+    StorageManager sm(&driver);
     TEST_ASSERT_FALSE(sm.load());
 
     sm.init();
@@ -143,7 +142,7 @@ void test_storage_load_defaults_when_invalid(void)
 
 void test_storage_factory_reset(void)
 {
-    StorageManager sm;
+    StorageManager sm(&driver);
     sm.init();
 
     sm.data().soh = 50.0f;

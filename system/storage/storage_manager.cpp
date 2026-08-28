@@ -8,6 +8,16 @@
 // Definido em drivers (ex.: nvs_driver.cpp) para resolver link/compilação.
 extern IStorageDriver& storageDriver;
 
+StorageManager::StorageManager(IStorageDriver* driver)
+    : driver_(driver != nullptr ? driver : &storageDriver)
+{
+}
+
+void StorageManager::setStorageDriver(IStorageDriver& driver)
+{
+    driver_ = &driver;
+}
+
 void StorageManager::init()
 {
     storage.version = STORAGE_VERSION;
@@ -22,29 +32,39 @@ void StorageManager::init()
 bool StorageManager::load()
 {
     StorageData tmp{};
-    if (!storageDriver.load(tmp))
+    if (driver_ == nullptr || !driver_->load(tmp))
         return false;
 
     storage = tmp;
 
-    // Se version não bater, tentamos tratar como inválido para simplificar.
     if (storage.version != STORAGE_VERSION)
     {
         return false;
     }
 
-    return validateCRC();
+    if (!validateCRC())
+    {
+        return false;
+    }
+
+    return true;
 }
 
 bool StorageManager::save()
 {
+    if (driver_ == nullptr)
+        return false;
+
     updateCRC();
-    return storageDriver.save(storage);
+    return driver_->save(storage);
 }
 
 void StorageManager::factoryReset()
 {
-    storageDriver.erase();
+    if (driver_ != nullptr)
+    {
+        driver_->erase();
+    }
     loadDefaults();
     save();
 }

@@ -117,7 +117,7 @@ void FaultManager::clearFault(FaultCode code)
 
 bool FaultManager::hasFault() const
 {
-    return activeCount_ > 0;
+    return (flags != FAULT_NONE) || (activeCount_ > 0u);
 }
 
 bool FaultManager::hasFault(FaultCode code) const
@@ -176,10 +176,36 @@ void FaultManager::persistToStorage(const FaultEvent& event)
  * API legada (compatibilidade)
  * ========================================================== */
 
+static FaultFlag faultCodeToLegacyFlag(FaultCode code)
+{
+    switch (code)
+    {
+        case FaultCode::BMS_CELL_OVERVOLTAGE:
+            return FAULT_CELL_OVERVOLTAGE;
+        case FaultCode::BMS_CELL_UNDERVOLTAGE:
+            return FAULT_CELL_UNDERVOLTAGE;
+        case FaultCode::BMS_OVER_TEMPERATURE:
+            return FAULT_OVER_TEMPERATURE;
+        case FaultCode::BMS_LOW_TEMPERATURE:
+            return FAULT_UNDER_TEMPERATURE;
+        case FaultCode::BMS_OVER_CURRENT:
+            return FAULT_OVER_CURRENT;
+        case FaultCode::BMS_SENSOR_FAILURE:
+            return FAULT_SENSOR_ERROR;
+        default:
+            return FAULT_NONE;
+    }
+}
+
 void FaultManager::clear()
 {
     flags = FAULT_NONE;
     faultInfo_ = FaultInfo{};
+    activeCount_ = 0;
+    for (std::size_t i = 0; i < MAX_ACTIVE_FAULTS; ++i)
+    {
+        activeFaults_[i] = FaultEvent{};
+    }
 }
 
 void FaultManager::addFault(FaultFlag fault)

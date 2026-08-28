@@ -95,16 +95,13 @@ void test_storage_crc_differs_on_change(void)
 // ============================================================================
 void test_storage_init_saves_defaults(void)
 {
-    // g_storage vazio -> load falha? Na prática mock retorna true com dados vazios.
-    // Para testar defaults, forçamos load falha.
     g_load_ok = false;
 
-    StorageManager sm;
+    StorageManager sm(&drive);
     sm.init();
 
     StorageData& d = sm.data();
 
-    // init chamou loadDefaults + save
     TEST_ASSERT_EQUAL_UINT32(1, d.version);
     TEST_ASSERT_FLOAT_WITHIN(0.01f, 100.0f, d.soc);
     TEST_ASSERT_FLOAT_WITHIN(0.01f, 100.0f, d.soh);
@@ -115,10 +112,9 @@ void test_storage_init_saves_defaults(void)
 
 void test_storage_save_then_load_roundtrip(void)
 {
-    StorageManager sm;
+    StorageManager sm(&driver);
     sm.init();
 
-    // Grava dados customizados
     StorageData& d = sm.data();
     d.soc = 42.0f;
     d.soh = 88.0f;
@@ -126,9 +122,7 @@ void test_storage_save_then_load_roundtrip(void)
 
     TEST_ASSERT_TRUE(sm.save());
 
-    // Novo manager - deve carregar o que foi salvo
-    g_load_ok = true;
-    StorageManager sm2;
+    StorageManager sm2(&drive);
     TEST_ASSERT_TRUE(sm2.load());
 
     StorageData& loaded = sm2.data();
@@ -139,17 +133,14 @@ void test_storage_save_then_load_roundtrip(void)
 
 void test_storage_load_defaults_when_invalid(void)
 {
-    // Corrompe storage (CRC inválido)
     g_load_ok = true;
     g_storage = StorageData{};
     g_storage.version = 0;
     g_storage.crc = 0xBAD;
 
-    StorageManager sm;
-    // load() deve retornar false (CRC inválido ou version errada)
+    StorageManager sm(&driver);
     TEST_ASSERT_FALSE(sm.load());
 
-    // init() então aplica defaults
     sm.init();
     TEST_ASSERT_FLOAT_WITHIN(0.01f, 100.0f, sm.data().soc);
     TEST_ASSERT_FLOAT_WITHIN(0.01f, 3.0f, sm.data().underVoltageLimit);
@@ -157,7 +148,7 @@ void test_storage_load_defaults_when_invalid(void)
 
 void test_storage_factory_reset(void)
 {
-    StorageManager sm;
+    StorageManager sm(&driver);
     sm.init();
 
     sm.data().soh = 50.0f;

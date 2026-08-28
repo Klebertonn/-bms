@@ -1,10 +1,14 @@
 #pragma once
 
 #include "storage_types.h"
+#include "storage_interface.h"
 
 class StorageManager
 {
 public:
+    StorageManager(IStorageDriver* driver = nullptr);
+
+    void setStorageDriver(IStorageDriver& driver);
     void init();
 
     bool load();
@@ -16,6 +20,7 @@ public:
 
 private:
     StorageData storage{};
+    IStorageDriver* driver_ = nullptr;
 
     bool validateCRC();
     void updateCRC();
