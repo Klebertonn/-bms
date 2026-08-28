@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guia BMS: PC e ESP32</title>
+  <style>
+    :root { --ink: #17212b; --muted: #52606d; --paper: #f6f7f2; --panel: #fff; --accent: #0b7285; --warn: #fff3cd; --line: #d9e2e8; }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--paper); font: 16px/1.6 Georgia, serif; }
+    main { max-width: 900px; margin: 0 auto; padding: 48px 22px 72px; }
+    h1, h2 { font-family: "Trebuchet MS", sans-serif; line-height: 1.15; }
+    h1 { margin-bottom: 8px; font-size: clamp(2rem, 5vw, 3.6rem); }
+    h2 { margin-top: 42px; color: var(--accent); }
+    .intro { color: var(--muted); font-size: 1.1rem; }
+    .warning { padding: 18px 20px; margin: 26px 0; background: var(--warn); border-left: 5px solid #d39e00; }
+    section { padding: 4px 0; }
+    pre { overflow-x: auto; padding: 16px; color: #e8f1f2; background: #17212b; border-radius: 6px; }
+    code { font-family: Consolas, monospace; }
+    p code, li code { padding: 2px 5px; background: #e7eef0; border-radius: 3px; }
+    li { margin: 7px 0; }
+    .checklist { padding: 20px 24px; background: var(--panel); border: 1px solid var(--line); }
+    footer { margin-top: 44px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Guia de execucao local e instalacao no ESP32</h1>
+  <p class="intro">Procedimento para demonstrar o BMS no PC, gravar o firmware e preparar uma bancada inicial.</p>
+
+  <div class="warning"><strong>Atencao:</strong> o projeto esta configurado para <code>PACK_CELL_COUNT = 3</code>, um pack 3S. Nao conecte uma unica celula diretamente sem ajustar a configuracao e validar o circuito de medicao.</div>
+
+  <section>
+    <h2>1. Pre-requisitos</h2>
+    <ul>
+      <li>VS Code com a extensao PlatformIO IDE.</li>
+      <li>Cabo USB de dados e placa ESP32 compativel com <code>esp32dev</code>.</li>
+      <li>Driver USB instalado, caso o Windows nao reconheca a porta COM.</li>
+    </ul>
+    <pre><code>cd "C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms"</code></pre>
+  </section>
+
+  <section>
+    <h2>2. Rodar no PC</h2>
+    <p>O ambiente <code>native</code> executa a logica em modo simulado, sem hardware fisico.</p>
+    <pre><code>pio run -e native
+pio test -e native</code></pre>
+    <p>Ultimo resultado validado: <strong>34 testes aprovados e 0 falhas</strong>.</p>
+  </section>
+
+  <section>
+    <h2>3. Abrir o dashboard</h2>
+    <p>Abra <code>web/index.html</code> no navegador. O modo demo usa dados simulados e nao exige o ESP32.</p>
+  </section>
+
+  <section>
+    <h2>4. Compilar para o ESP32</h2>
+    <p>Com a bateria desconectada, compile o firmware:</p>
+    <pre><code>pio run -e esp32dev</code></pre>
+    <p>O ambiente usa Arduino, INA219, MAX17048, OLED SSD1306, CAN TWAI e BLE.</p>
+  </section>
+
+  <section>
+    <h2>5. Gravar e monitorar</h2>
+    <ol>
+      <li>Conecte o ESP32 ao PC por USB.</li>
+      <li>Confirme a porta COM no PlatformIO.</li>
+      <li>Execute:</li>
+    </ol>
+    <pre><code>pio run -e esp32dev -t upload
+pio device monitor -b 115200</code></pre>
+    <p>Se o upload ficar aguardando, mantenha <code>BOOT</code> pressionado no inicio e solte quando a gravacao comecar.</p>
+  </section>
+
+  <section>
+    <h2>6. Confirmar o boot</h2>
+    <p>Reinicie a placa com o monitor aberto. Procure mensagens de boot, deteccao dos perifericos e <code>[BMS] READY</code>. Uma mensagem <code>FAIL</code> indica que o periferico nao foi detectado e deve ser investigado antes do teste com bateria.</p>
+  </section>
+
+  <section>
+    <h2>7. Ordem da bancada</h2>
+    <ol>
+      <li>Grave e teste o ESP32 sem bateria.</li>
+      <li>Valide INA219, OLED, MAX17048 e NTC.</li>
+      <li>Confirme que os MOSFETs iniciam desligados.</li>
+      <li>Use fonte de laboratorio com limite de corrente e fusivel.</li>
+      <li>Meça as tensoes com multimetro antes de habilitar carga ou descarga.</li>
+      <li>Avance para uma celula ou pack de teste protegido apenas depois dessas verificacoes.</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>8. Seguranca eletrica</h2>
+    <ul>
+      <li>Nunca ligue uma celula de litio diretamente a um GPIO do ESP32.</li>
+      <li>O ADC atual usa <code>SCALE_FACTOR = 1.0f</code>; uma celula de 4,2 V pode exceder a faixa segura do ADC.</li>
+      <li>Use divisor de tensao ou circuito dedicado de monitoramento validado com multimetro.</li>
+      <li>Para uma unica celula, ajuste <code>PACK_CELL_COUNT</code>, limites, SOC e mapeamento do ADC antes do teste.</li>
+      <li>Nao carregue a celula sem carregador apropriado e supervisao.</li>
+    </ul>
+  </section>
+
+  <section class="checklist">
+    <h2>Checklist</h2>
+    <ul>
+      <li>&#x2610; Testes nativos passaram</li>
+      <li>&#x2610; Dashboard abriu</li>
+      <li>&#x2610; Firmware ESP32 compilou e foi gravado</li>
+      <li>&#x2610; Boot serial confirmado em 115200</li>
+      <li>&#x2610; Sensores detectados</li>
+      <li>&#x2610; ADC, divisor e MOSFETs validados</li>
+      <li>&#x2610; Fonte limitada e fusivel instalados</li>
+    </ul>
+  </section>
+
+  <footer>Avance para packs reais somente depois de validar todos os itens de hardware e seguranca.</footer>
+</main>
+</body>
+</html>
