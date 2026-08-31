@@ -1,0 +1,9 @@
+{
+    "name": "bms-core",
+    "version": "1.0.0",
+    "description": "BMS core domain modules (fault, battery, protection, state, etc.).",
+    "keywords": ["bms", "core", "domain"],
+    "build": {
+        "srcDir": "."
+    }
+}

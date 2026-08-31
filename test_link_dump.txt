@@ -1,0 +1,541 @@
+﻿Collected 3 tests (native/test_fault, native/test_self_test, native/test_storage)
+
+Processing native/test_fault in native environment
+--------------------------------------------------------------------------------
+Building...
+pio : C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_fault_init_has_no_faults()':
+No linha:1 caractere:1
++ pio test -e native -v 2>&1 | Out-File -FilePath test_link_dump.txt -E ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:/msys64/mingw...s_no_faults()'::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:24:(.text+0x203): undefined reference 
+to `FaultManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:26:(.text+0x20b): undefined reference 
+to `FaultManager::hasFault() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:27:(.text+0x219): undefined reference 
+to `FaultManager::getFaults() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_fault_add_fault()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:34:(.text+0x29d): undefined reference 
+to `FaultManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:36:(.text+0x2aa): undefined reference 
+to `FaultManager::addFault(FaultFlag)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:38:(.text+0x2b2): undefined reference 
+to `FaultManager::hasFault() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:39:(.text+0x2c5): undefined reference 
+to `FaultManager::hasFault(FaultFlag) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:40:(.text+0x2d8): undefined reference 
+to `FaultManager::hasFault(FaultFlag) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_fault_add_multiple()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:46:(.text+0x34a): undefined reference 
+to `FaultManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:48:(.text+0x357): undefined reference 
+to `FaultManager::addFault(FaultFlag)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:49:(.text+0x364): undefined reference 
+to `FaultManager::addFault(FaultFlag)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:51:(.text+0x371): undefined reference 
+to `FaultManager::hasFault(FaultFlag) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:52:(.text+0x384): undefined reference 
+to `FaultManager::hasFault(FaultFlag) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:53:(.text+0x392): undefined reference 
+to `FaultManager::getFaults() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_fault_clear()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:62:(.text+0x410): undefined reference 
+to `FaultManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:64:(.text+0x41d): undefined reference 
+to `FaultManager::addFault(FaultFlag)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:65:(.text+0x42a): undefined reference 
+to `FaultManager::addFault(FaultFlag)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:66:(.text+0x432): undefined reference 
+to `FaultManager::hasFault() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:68:(.text+0x443): undefined reference 
+to `FaultManager::clear()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:70:(.text+0x44b): undefined reference 
+to `FaultManager::hasFault() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:71:(.text+0x459): undefined reference 
+to `FaultManager::getFaults() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_fault_evaluate_overvoltage()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:102:(.text+0x4d7): undefined reference 
+to `FaultManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:107:(.text+0x524): undefined reference 
+to `FaultManager::evaluate(BatteryPack const&)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:109:(.text+0x52c): undefined reference 
+to `FaultManager::hasFault() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:110:(.text+0x546): undefined reference 
+to `FaultManager::hasFault(FaultFlag) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_fault_evaluate_undervoltage()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:120:(.text+0x63d): undefined reference 
+to `FaultManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:125:(.text+0x68a): undefined reference 
+to `FaultManager::evaluate(BatteryPack const&)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:127:(.text+0x697): undefined reference 
+to `FaultManager::hasFault(FaultFlag) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_fault_evaluate_overtemperature()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:137:(.text+0x77d): undefined reference 
+to `FaultManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:142:(.text+0x7cc): undefined reference 
+to `FaultManager::evaluate(BatteryPack const&)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:144:(.text+0x7d9): undefined reference 
+to `FaultManager::hasFault(FaultFlag) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_fault_evaluate_overcurrent()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:154:(.text+0x8bf): undefined reference 
+to `FaultManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:159:(.text+0x912): undefined reference 
+to `FaultManager::evaluate(BatteryPack const&)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:161:(.text+0x91f): undefined reference 
+to `FaultManager::hasFault(FaultFlag) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_fault_evaluate_normal_pack()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:170:(.text+0x9d7): undefined reference 
+to `FaultManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:175:(.text+0xa1c): undefined reference 
+to `FaultManager::evaluate(BatteryPack const&)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:177:(.text+0xa24): undefined reference 
+to `FaultManager::hasFault() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_dtc_raise_multiple_distinct_faults()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:280:(.text+0xa8f): undefined reference 
+to `FaultManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:282:(.text+0xa9c): undefined reference 
+to `FaultManager::raiseFault(FaultCode)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:283:(.text+0xaa9): undefined reference 
+to `FaultManager::raiseFault(FaultCode)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:284:(.text+0xab6): undefined reference 
+to `FaultManager::raiseFault(FaultCode)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:286:(.text+0xabe): undefined reference 
+to `FaultManager::getActiveFaults() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:287:(.text+0xaeb): undefined reference 
+to `FaultManager::hasFault(FaultCode) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:288:(.text+0xafe): undefined reference 
+to `FaultManager::hasFault(FaultCode) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:289:(.text+0xb11): undefined reference 
+to `FaultManager::hasFault(FaultCode) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_dtc_raise_same_fault_increments_occurrence()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:246:(.text+0xb86): undefined reference 
+to `FaultManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:248:(.text+0xb93): undefined reference 
+to `FaultManager::raiseFault(FaultCode)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:249:(.text+0xba0): undefined reference 
+to `FaultManager::raiseFault(FaultCode)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:252:(.text+0xba8): undefined reference 
+to `FaultManager::getActiveFaults() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:255:(.text+0xc5b): undefined reference 
+to `FaultManager::getActiveFault(unsigned long long, FaultEvent&) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_registry_code_to_string()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:298:(.text+0xc97): undefined reference 
+to `FaultRegistry::codeToString(FaultCode)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:299:(.text+0xcbc): undefined reference 
+to `FaultRegistry::codeToString(FaultCode)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:300:(.text+0xce1): undefined reference 
+to `FaultRegistry::codeToString(FaultCode)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:301:(.text+0xd06): undefined reference 
+to `FaultRegistry::codeToString(FaultCode)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:302:(.text+0xd2b): undefined reference 
+to `FaultRegistry::codeToString(FaultCode)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_dtc_raise_fault_creates_active_event()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:217:(.text+0xd7e): undefined reference 
+to `FaultManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:221:(.text+0xf1e): undefined reference 
+to `FaultManager::setLogSink(IFaultLogSink*)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:222:(.text+0xf2e): undefined reference 
+to `FaultManager::setStorageSink(IFaultStorageSink*)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:224:(.text+0xf3b): undefined reference 
+to `FaultManager::raiseFault(FaultCode)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:226:(.text+0xf43): undefined reference 
+to `FaultManager::hasFault() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:227:(.text+0xf59): undefined reference 
+to `FaultManager::hasFault(FaultCode) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:228:(.text+0xfc1): undefined reference 
+to `FaultManager::getActiveFaults() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:236:(.text+0x10d8): undefined 
+reference to `FaultManager::getActiveFault(unsigned long long, FaultEvent&) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:240:(.text+0x1161): undefined 
+reference to `FaultRegistry::codeToString(FaultCode)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_dtc_clear_fault_removes_active()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:262:(.text+0x11f5): undefined 
+reference to `FaultManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:265:(.text+0x129a): undefined 
+reference to `FaultManager::setLogSink(IFaultLogSink*)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:267:(.text+0x12a7): undefined 
+reference to `FaultManager::raiseFault(FaultCode)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:268:(.text+0x12af): undefined 
+reference to `FaultManager::hasFault() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:270:(.text+0x12c5): undefined 
+reference to `FaultManager::clearFault(FaultCode)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:272:(.text+0x1305): undefined 
+reference to `FaultManager::hasFault() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:273:(.text+0x131b): undefined 
+reference to `FaultManager::hasFault(FaultCode) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:274:(.text+0x133f): undefined 
+reference to `FaultManager::getActiveFaults() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_registry_severity()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:307:(.text+0x13a3): undefined 
+reference to `FaultRegistry::findSeverity(FaultCode)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:308:(.text+0x13ce): undefined 
+reference to `FaultRegistry::findSeverity(FaultCode)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:309:(.text+0x13f9): undefined 
+reference to `FaultRegistry::findSeverity(FaultCode)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:310:(.text+0x1424): undefined 
+reference to `FaultRegistry::findSeverity(FaultCode)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_registry_string_to_code()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:315:(.text+0x145b): undefined 
+reference to `FaultRegistry::stringToCode(char const*)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:316:(.text+0x1488): undefined 
+reference to `FaultRegistry::stringToCode(char const*)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_dtc02_protection_normalization_clears_fault()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:384:(.text+0x14e0): undefined 
+reference to `FaultManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:386:(.text+0x150c): undefined 
+reference to `ProtectionManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:391:(.text+0x1570): undefined 
+reference to `ProtectionManager::update(BatteryPack const&, FaultManager&)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:392:(.text+0x157d): undefined 
+reference to `FaultManager::hasFault(FaultCode) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:398:(.text+0x15f7): undefined 
+reference to `ProtectionManager::update(BatteryPack const&, FaultManager&)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:400:(.text+0x1604): undefined 
+reference to `FaultManager::hasFault(FaultCode) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:401:(.text+0x1615): undefined 
+reference to `FaultManager::hasFault() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:402:(.text+0x1626): undefined 
+reference to `FaultManager::getActiveFaults() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function 
+`test_dtc02_protection_multiple_simultaneous_faults()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:471:(.text+0x16b7): undefined 
+reference to `FaultManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:473:(.text+0x16e3): undefined 
+reference to `ProtectionManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:478:(.text+0x1748): undefined 
+reference to `ProtectionManager::update(BatteryPack const&, FaultManager&)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:480:(.text+0x1755): undefined 
+reference to `FaultManager::hasFault(FaultCode) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:481:(.text+0x176b): undefined 
+reference to `FaultManager::hasFault(FaultCode) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:482:(.text+0x177c): undefined 
+reference to `FaultManager::getActiveFaults() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_dtc02_protection_cell_overvoltage_source()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:355:(.text+0x17fc): undefined 
+reference to `FaultManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:357:(.text+0x1828): undefined 
+reference to `ProtectionManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:363:(.text+0x188c): undefined 
+reference to `ProtectionManager::update(BatteryPack const&, FaultManager&)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:365:(.text+0x1899): undefined 
+reference to `FaultManager::hasFault(FaultCode) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:368:(.text+0x1939): undefined 
+reference to `FaultManager::getActiveFault(unsigned long long, FaultEvent&) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_dtc02_protection_cell_undervoltage_source()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:409:(.text+0x1a5e): undefined 
+reference to `FaultManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:411:(.text+0x1a8a): undefined 
+reference to `ProtectionManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:417:(.text+0x1aee): undefined 
+reference to `ProtectionManager::update(BatteryPack const&, FaultManager&)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:419:(.text+0x1afb): undefined 
+reference to `FaultManager::hasFault(FaultCode) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:422:(.text+0x1b9b): undefined 
+reference to `FaultManager::getActiveFault(unsigned long long, FaultEvent&) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_dtc02_protection_over_temperature()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:433:(.text+0x1c9d): undefined 
+reference to `FaultManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:435:(.text+0x1cc9): undefined 
+reference to `ProtectionManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:440:(.text+0x1d2a): undefined 
+reference to `ProtectionManager::update(BatteryPack const&, FaultManager&)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:442:(.text+0x1d37): undefined 
+reference to `FaultManager::hasFault(FaultCode) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:443:(.text+0x1d4b): undefined 
+reference to `ProtectionManager::getState() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:444:(.text+0x1d74): undefined 
+reference to `ProtectionManager::chargeEnabled() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:445:(.text+0x1d85): undefined 
+reference to `ProtectionManager::dischargeEnabled() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_dtc02_protection_over_current()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:452:(.text+0x1df9): undefined 
+reference to `FaultManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:454:(.text+0x1e25): undefined 
+reference to `ProtectionManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:459:(.text+0x1e8a): undefined 
+reference to `ProtectionManager::update(BatteryPack const&, FaultManager&)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:461:(.text+0x1e97): undefined 
+reference to `FaultManager::hasFault(FaultCode) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:462:(.text+0x1eab): undefined 
+reference to `ProtectionManager::getState() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:463:(.text+0x1ed4): undefined 
+reference to `ProtectionManager::chargeEnabled() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:464:(.text+0x1ee5): undefined 
+reference to `ProtectionManager::dischargeEnabled() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_dtc02_protection_overvoltage_mosfet()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:489:(.text+0x1f59): undefined 
+reference to `FaultManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:491:(.text+0x1f85): undefined 
+reference to `ProtectionManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:496:(.text+0x1fe6): undefined 
+reference to `ProtectionManager::update(BatteryPack const&, FaultManager&)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:498:(.text+0x1fee): undefined 
+reference to `ProtectionManager::getState() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:499:(.text+0x2017): undefined 
+reference to `ProtectionManager::chargeEnabled() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:500:(.text+0x2028): undefined 
+reference to `ProtectionManager::dischargeEnabled() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_fault\test_dtc.o: in function `test_dtc02_protection_short_circuit()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:507:(.text+0x208b): undefined 
+reference to `FaultManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:509:(.text+0x20b7): undefined 
+reference to `ProtectionManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:514:(.text+0x211c): undefined 
+reference to `ProtectionManager::update(BatteryPack const&, FaultManager&)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:516:(.text+0x2129): undefined 
+reference to `FaultManager::hasFault(FaultCode) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:517:(.text+0x213f): undefined 
+reference to `FaultManager::hasFault(FaultCode) const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:518:(.text+0x2153): undefined 
+reference to `ProtectionManager::getState() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:519:(.text+0x217c): undefined 
+reference to `ProtectionManager::chargeEnabled() const'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_fault/test_dtc.cpp:520:(.text+0x218d): undefined 
+reference to `ProtectionManager::dischargeEnabled() const'
+collect2.exe: error: ld returned 1 exit status
+*** [.pio\build\native\program.exe] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+------------- native:native/test_fault [ERRORED] Took 1.94 seconds -------------
+
+Processing native/test_self_test in native environment
+--------------------------------------------------------------------------------
+Building...
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_self_test\test_self_test.o: in function `test_self_test_deterministic()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_self_test/test_self_test.cpp:49:(.text+0x5e): undefined 
+reference to `SelfTest::run()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_self_test/test_self_test.cpp:52:(.text+0x6a): undefined 
+reference to `SelfTest::run()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_self_test\test_self_test.o: in function `test_self_test_run_passes()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_self_test/test_self_test.cpp:24:(.text+0xd6): undefined 
+reference to `SelfTest::run()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_self_test\test_self_test.o: in function `test_self_test_all_components_ok()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_self_test/test_self_test.cpp:34:(.text+0x158): undefined 
+reference to `SelfTest::run()'
+collect2.exe: error: ld returned 1 exit status
+*** [.pio\build\native\program.exe] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+----------- native:native/test_self_test [ERRORED] Took 1.73 seconds -----------
+
+Processing native/test_storage in native environment
+--------------------------------------------------------------------------------
+Building...
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_storage\test_storage.o: in function `test_storage_crc_deterministic()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_storage/test_storage.cpp:69:(.text+0x150): undefined 
+reference to `crc32(void const*, unsigned long long)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_storage/test_storage.cpp:70:(.text+0x161): undefined 
+reference to `crc32(void const*, unsigned long long)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_storage\test_storage.o: in function `test_storage_crc_differs_on_change()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_storage/test_storage.cpp:84:(.text+0x209): undefined 
+reference to `crc32(void const*, unsigned long long)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_storage/test_storage.cpp:85:(.text+0x21a): undefined 
+reference to `crc32(void const*, unsigned long long)'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_storage\test_storage.o: in function `test_storage_init_saves_defaults()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_storage/test_storage.cpp:95:(.text+0x27a): undefined 
+reference to `StorageManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_storage/test_storage.cpp:97:(.text+0x282): undefined 
+reference to `StorageManager::data()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_storage\test_storage.o: in function `test_storage_save_then_load_roundtrip()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_storage/test_storage.cpp:110:(.text+0x3a0): undefined 
+reference to `StorageManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_storage/test_storage.cpp:112:(.text+0x3a8): undefined 
+reference to `StorageManager::data()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_storage/test_storage.cpp:117:(.text+0x3c5): undefined 
+reference to `StorageManager::save()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_storage/test_storage.cpp:121:(.text+0x3f5): undefined 
+reference to `StorageManager::load()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_storage/test_storage.cpp:123:(.text+0x407): undefined 
+reference to `StorageManager::data()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_storage\test_storage.o: in function `test_storage_load_defaults_when_invalid()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_storage/test_storage.cpp:137:(.text+0x4fa): undefined 
+reference to `StorageManager::load()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_storage/test_storage.cpp:139:(.text+0x50b): undefined 
+reference to `StorageManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_storage/test_storage.cpp:140:(.text+0x513): undefined 
+reference to `StorageManager::data()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_storage/test_storage.cpp:141:(.text+0x544): undefined 
+reference to `StorageManager::data()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+.pio\build\native\test\native\test_storage\test_storage.o: in function `test_storage_factory_reset()':
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_storage/test_storage.cpp:147:(.text+0x5af): undefined 
+reference to `StorageManager::init()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_storage/test_storage.cpp:149:(.text+0x5b7): undefined 
+reference to `StorageManager::data()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_storage/test_storage.cpp:150:(.text+0x5c6): undefined 
+reference to `StorageManager::data()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_storage/test_storage.cpp:151:(.text+0x5d5): undefined 
+reference to `StorageManager::save()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_storage/test_storage.cpp:153:(.text+0x5ea): undefined 
+reference to `StorageManager::factoryReset()'
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/15.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: 
+C:\Users\Klebe\OneDrive\Desktop\BMSPC2\-bms/test/native/test_storage/test_storage.cpp:155:(.text+0x5f2): undefined 
+reference to `StorageManager::data()'
+collect2.exe: error: ld returned 1 exit status
+*** [.pio\build\native\program.exe] Error 1
+Building stage has failed, see errors above. Use `pio test -vvv` option to enable verbose output.
+------------ native:native/test_storage [ERRORED] Took 1.72 seconds ------------
+
+=================================== SUMMARY ===================================
+Environment    Test                   Status    Duration
+-------------  ---------------------  --------  ------------
+esp32dev       native/test_fault      SKIPPED
+esp32dev       native/test_self_test  SKIPPED
+esp32dev       native/test_storage    SKIPPED
+native         native/test_fault      ERRORED   00:00:01.938
+native         native/test_self_test  ERRORED   00:00:01.732
+native         native/test_storage    ERRORED   00:00:01.715
+================== 3 test cases: 0 succeeded in 00:00:05.385 ==================
