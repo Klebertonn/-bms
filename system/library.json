@@ -1,0 +1,9 @@
+{
+    "name": "bms-system",
+    "version": "1.0.0",
+    "description": "BMS system services (logger, storage, scheduler, rtos, clock).",
+    "keywords": ["bms", "system", "services"],
+    "build": {
+        "srcDir": "."
+    }
+}

@@ -1,0 +1,22 @@
+#pragma once
+
+enum class ProtectionState
+{
+    NORMAL,
+
+    OVER_VOLTAGE,
+    UNDER_VOLTAGE,
+
+    OVER_TEMPERATURE,
+    UNDER_TEMPERATURE,
+
+    OVER_CURRENT_CHARGE,
+    OVER_CURRENT_DISCHARGE,
+
+    SHORT_CIRCUIT,
+
+    SENSOR_FAILURE,
+
+    UNKNOWN
+};
+
