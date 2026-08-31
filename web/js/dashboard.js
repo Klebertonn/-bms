@@ -95,41 +95,59 @@ function renderCells(data) {
     if (!grid) return;
 
     const cells = data.cells || [];
-    let html = '';
+    const staticLabels = ['Cell 1', 'Cell 2', 'Cell 3', 'Menor', 'Maior', 'Delta'];
 
+    if (!grid.dataset.initialized) {
+        const html = staticLabels.map((label, index) => {
+            const extraClass = index >= 3 ? 'cell--info' : '';
+            return `
+                <div class="cell-item ${extraClass}">
+                    <span class="cell__label">${label}</span>
+                    <span class="cell__voltage">--</span>
+                    <span class="cell__status">--</span>
+                </div>`;
+        }).join('');
+
+        grid.innerHTML = html;
+        grid.dataset.initialized = 'true';
+    }
+
+    const items = grid.querySelectorAll('.cell-item');
     cells.forEach((cell, i) => {
+        const item = items[i];
+        if (!item) return;
+
         const isOver = cell.voltage > 4.25;
         const isUnder = cell.voltage < 3.00;
         const statusClass = isOver ? 'cell--over' : isUnder ? 'cell--under' : 'cell--ok';
         const statusText = isOver ? 'SOBRETENSÃO' : isUnder ? 'SUBTENSÃO' : 'OK';
 
-        html += `
-            <div class="cell-item ${statusClass}">
-                <span class="cell__label">Cell ${i + 1}</span>
-                <span class="cell__voltage">${cell.voltage.toFixed(3)} V</span>
-                <span class="cell__status">${statusText}</span>
-            </div>`;
+        item.className = `cell-item ${statusClass}`;
+        item.querySelector('.cell__voltage').textContent = `${cell.voltage.toFixed(3)} V`;
+        item.querySelector('.cell__status').textContent = statusText;
     });
 
-    // Min / Max / Delta
-    html += `
-        <div class="cell-item cell--info">
-            <span class="cell__label">Menor</span>
-            <span class="cell__voltage">${data.minCell.toFixed(3)} V</span>
-            <span class="cell__status">MIN</span>
-        </div>
-        <div class="cell-item cell--info">
-            <span class="cell__label">Maior</span>
-            <span class="cell__voltage">${data.maxCell.toFixed(3)} V</span>
-            <span class="cell__status">MAX</span>
-        </div>
-        <div class="cell-item cell--info">
-            <span class="cell__label">Delta</span>
-            <span class="cell__voltage">${(data.cellDelta * 1000).toFixed(0)} mV</span>
-            <span class="cell__status">ΔV</span>
-        </div>`;
+    const minItem = items[3];
+    const maxItem = items[4];
+    const deltaItem = items[5];
 
-    grid.innerHTML = html;
+    if (minItem) {
+        minItem.className = 'cell-item cell--info';
+        minItem.querySelector('.cell__voltage').textContent = `${data.minCell.toFixed(3)} V`;
+        minItem.querySelector('.cell__status').textContent = 'MIN';
+    }
+
+    if (maxItem) {
+        maxItem.className = 'cell-item cell--info';
+        maxItem.querySelector('.cell__voltage').textContent = `${data.maxCell.toFixed(3)} V`;
+        maxItem.querySelector('.cell__status').textContent = 'MAX';
+    }
+
+    if (deltaItem) {
+        deltaItem.className = 'cell-item cell--info';
+        deltaItem.querySelector('.cell__voltage').textContent = `${(data.cellDelta * 1000).toFixed(0)} mV`;
+        deltaItem.querySelector('.cell__status').textContent = 'ΔV';
+    }
 }
 
 /**

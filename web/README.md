@@ -30,6 +30,19 @@ web/
 
 ## Como executar
 
+### Simulação local em paralelo com o BMS
+
+Para iniciar a simulação do firmware e abrir o dashboard web ao mesmo tempo, execute:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\start_bms_simulation.ps1
+```
+
+Esse script:
+- executa o binário nativo do BMS em `.\.pio\build\native\program.exe`
+- abre automaticamente o dashboard em `web\index.html`
+- mantém o fluxo de simulação e o painel web sincronizados em modo local
+
 ### Modo demo (padrão)
 
 Basta abrir o `index.html` no navegador. Os dados são simulados em tempo real.

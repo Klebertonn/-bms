@@ -221,9 +221,11 @@ void App::printFaultHistory()
 
 void App::update()
 {
-    // Contadores para status periódico (5 s)
+    // Contadores para status periódico (modo terminal estável)
     static std::uint64_t lastStatusMs = 0;
+    static std::uint64_t lastIndustrialPrintMs = 0;
     static std::uint64_t loopCount = 0;
+    static bool terminalHeaderPrinted = false;
     ++loopCount;
 
     //-------------------------------------------------
@@ -401,29 +403,25 @@ void App::update()
     // BMS INDUSTRIAL (exibição quando há falha ativa)
     //-------------------------------------------------
 
-    if (activeCount > 0)
+    if (activeCount > 0 && (nowMs - lastIndustrialPrintMs) >= 2000)
     {
+        lastIndustrialPrintMs = nowMs;
+
         FaultEvent fe;
         if (fault_.getActiveFault(0, fe))
         {
             std::uint16_t legacyCode = 0;
             const FaultReason reason = faultCodeToReason(fe.code, legacyCode);
 
-            printf("\n=============== BMS INDUSTRIAL ===============\n");
-            printf("STATE MACHINE : %s\n", bmsStateMachine_.toString());
-            printf("STATE         : %s\n\n", stateManager_.toString());
-
-            printf("FAULT CODE   : 0x%04X\n", legacyCode);
-            printf("FAULT NAME   : %s\n", faultReasonToString(reason));
-            printf("SOURCE CELL  : %u\n", static_cast<unsigned>(fe.source));
-            printf("MEASURED     : %.3f V\n", fe.measuredValue);
-            printf("LIMIT        : %.3f V\n\n", fe.limit);
-
-            printf("ACTION\n");
-            printf(" CHARGE MOSFET      %s\n", mosfetDriver_->chargeEnabled() ? "ON" : "OFF");
-            printf(" DISCHARGE MOSFET   %s\n", mosfetDriver_->dischargeEnabled() ? "ON" : "OFF");
-            printf(" BALANCE            %s\n", mosfetDriver_->balanceEnabled() ? "ON" : "OFF");
-            printf("==============================================\n\n");
+            printf("\nFAULT=%s CODE=0x%04X CELL=%u MEASURED=%.3fV LIMIT=%.3fV CHARGE=%s DISCHARGE=%s BALANCE=%s\n",
+                   faultReasonToString(reason),
+                   legacyCode,
+                   static_cast<unsigned>(fe.source),
+                   fe.measuredValue,
+                   fe.limit,
+                   mosfetDriver_->chargeEnabled() ? "ON" : "OFF",
+                   mosfetDriver_->dischargeEnabled() ? "ON" : "OFF",
+                   mosfetDriver_->balanceEnabled() ? "ON" : "OFF");
         }
     }
 
@@ -474,10 +472,11 @@ void App::update()
         protection_.dischargeEnabled() ? "ON" : "OFF"
     );
 
-    // Fault History (a cada 5 s)
-    if ((nowMs - lastStatusMs) < 100)
+    // Fault History em intervalo longo para manter o terminal estável.
+    if ((nowMs - lastStatusMs) >= 15000)
     {
         printFaultHistory();
+        lastStatusMs = nowMs;
     }
 
     //-------------------------------------------------

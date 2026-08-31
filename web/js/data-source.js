@@ -15,7 +15,7 @@
 
 const BMS_DATA_SOURCE = 'demo'; // 'demo' | 'api'
 const BMS_API_URL = 'http://192.168.4.1/api/bms'; // exemplo ESP32 (AP)
-const BMS_API_INTERVAL_MS = 1000;
+const BMS_API_INTERVAL_MS = 2500;
 
 /**
  * Estado compartilhado do dashboard.
@@ -205,7 +205,7 @@ function startDemoLoop() {
         BMSState.data = generateDemoData();
         BMSState.heartbeat = { alive: true, lastBeat: Date.now() };
         notifyBMSData();
-    }, 1000);
+    }, BMS_API_INTERVAL_MS);
 }
 
 /**

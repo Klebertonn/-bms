@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Guia de Execução Local - Simulação do Firmware</title>
+    <style>
+      :root {
+        --bg: #0f172a;
+        --panel: #111827;
+        --panel-2: #1f2937;
+        --card: #0b1220;
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+        --accent: #22c55e;
+        --accent-2: #38bdf8;
+        --warning: #f59e0b;
+        --border: #334155;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: linear-gradient(180deg, #020817 0%, #0f172a 100%);
+        color: var(--text);
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 40px auto;
+        padding: 24px;
+      }
+
+      .hero {
+        background: linear-gradient(135deg, rgba(34,197,94,0.18), rgba(56,189,248,0.15));
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 32px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: clamp(2rem, 4vw, 3rem);
+      }
+
+      .subtitle {
+        margin: 0;
+        color: var(--muted);
+        font-size: 1.05rem;
+        line-height: 1.6;
+      }
+
+      .grid {
+        display: grid;
+        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        margin-top: 28px;
+      }
+
+      .card {
+        background: rgba(15, 23, 42, 0.88);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 22px;
+      }
+
+      h2 {
+        margin-top: 0;
+        font-size: 1.3rem;
+        color: #f8fafc;
+      }
+
+      ul {
+        margin: 12px 0 0 18px;
+        padding: 0;
+        color: var(--text);
+        line-height: 1.7;
+      }
+
+      code, pre {
+        font-family: Consolas, "Courier New", monospace;
+      }
+
+      pre {
+        background: #020817;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        color: #dbeafe;
+        padding: 16px;
+        overflow-x: auto;
+        margin: 16px 0 0;
+        line-height: 1.6;
+      }
+
+      .badge {
+        display: inline-block;
+        background: rgba(34,197,94,0.14);
+        color: #bbf7d0;
+        border: 1px solid rgba(34,197,94,0.4);
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-size: 0.82rem;
+        margin-bottom: 12px;
+        font-weight: 700;
+      }
+
+      .note {
+        background: rgba(245,158,11,0.08);
+        border-left: 4px solid var(--warning);
+        padding: 14px 16px;
+        border-radius: 10px;
+        color: #fef3c7;
+        margin-top: 20px;
+      }
+
+      .footer {
+        margin-top: 24px;
+        color: var(--muted);
+        text-align: center;
+        font-size: 0.92rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <section class="hero">
+        <div class="badge">BMS Firmware</div>
+        <h1>Guia de execução local para simulação do firmware</h1>
+        <p class="subtitle">
+          Este guia mostra como compilar e executar o firmware em modo simulado no PC,
+          sem hardware físico, e também como abrir o dashboard local com dados simulados.
+        </p>
+      </section>
+
+      <div class="grid">
+        <section class="card">
+          <h2>1. Pré-requisitos</h2>
+          <ul>
+            <li>VS Code</li>
+            <li>Extensão PlatformIO IDE</li>
+            <li>Git instalado no sistema</li>
+            <li>Terminal PowerShell ou CMD</li>
+          </ul>
+
+          <pre>cd "C:\Users\Klebe\OneDrive\Desktop\bmsfc"</pre>
+        </section>
+
+        <section class="card">
+          <h2>2. Compilar em modo simulado</h2>
+          <p>O ambiente <strong>native</strong> executa a lógica do firmware em mock/simulação no computador.</p>
+          <pre>pio run -e native</pre>
+        </section>
+
+        <section class="card">
+          <h2>3. Executar a simulação do BMS + dashboard web</h2>
+          <p>Para iniciar o firmware e abrir o painel web em paralelo, use o script local de execução simultânea.</p>
+          <pre>powershell -ExecutionPolicy Bypass -File .\scripts\start_bms_simulation.ps1</pre>
+          <p>Esse fluxo abre ao mesmo tempo:</p>
+          <ul>
+            <li>o BMS em ambiente native</li>
+            <li>o dashboard em <strong>web/index.html</strong></li>
+          </ul>
+          <p>Se quiser rodar apenas o firmware em console:</p>
+          <pre>.\.pio\build\native\program.exe</pre>
+          <p>Exemplo de saída observada durante a execução:</p>
+          <pre>[HEARTBEAT] ALIVE=YES STATE=READY UPTIME=14063 ms SOC=100% TEMP=25.0 C
+
+=============== BMS INDUSTRIAL ===============
+STATE MACHINE : READY
+STATE         : FAULT
+FAULT CODE   : 0x0101
+FAULT NAME   : CELL_OVERVOLTAGE
+SOURCE CELL  : 1
+MEASURED     : 4.300 V
+LIMIT        : 4.200 V
+
+ACTION
+ CHARGE MOSFET      OFF
+ DISCHARGE MOSFET   ON
+ BALANCE            OFF
+==============================================</pre>
+        </section>
+
+        <section class="card">
+          <h2>4. Executar testes</h2>
+          <p>Valide a simulação com a suíte de testes nativos.</p>
+          <pre>pio test -e native</pre>
+        </section>
+
+        <section class="card">
+          <h2>5. Abrir o dashboard local</h2>
+          <p>O dashboard demo usa dados simulados e não precisa de ESP32.</p>
+          <pre>web\index.html</pre>
+          <p>Você pode abrir este arquivo diretamente no navegador ou usar a opção <strong>Open with Default Browser</strong> no VS Code.</p>
+        </section>
+      </div>
+
+      <section class="card" style="margin-top: 24px;">
+        <h2>5. Fluxo rápido de uso</h2>
+        <pre>cd "C:\Users\Klebe\OneDrive\Desktop\bmsfc"
+pio run -e native
+pio test -e native
+Start "web\index.html"</pre>
+      </section>
+
+      <div class="note">
+        <strong>Observação:</strong> o ambiente <strong>native</strong> foi configurado para simulação no PC. Ele é o caminho recomendado para testar a lógica do firmware sem hardware real e para validar comportamentos antes de gravar o firmware na placa ESP32.
+      </div>
+
+      <section class="card" style="margin-top: 24px;">
+        <h2>6. Verificação de sucesso</h2>
+        <ul>
+          <li>Build do projeto concluído com sucesso</li>
+          <li>Teste nativo executado sem falhas</li>
+          <li>Dashboard carregando em navegador</li>
+          <li>Firmware em simulação funcionando corretamente</li>
+        </ul>
+      </section>
+
+      <div class="footer">
+        Projeto BMS • Simulação local via PlatformIO
+      </div>
+    </div>
+  </body>
+</html>

@@ -29,6 +29,47 @@ O ambiente `native` executa a logica em modo simulado, sem hardware fisico.
 pio run -e native
 ```
 
+### Executar a simulação do BMS e abrir o dashboard web
+
+Para iniciar a simulação do firmware e abrir o painel web ao mesmo tempo, use o script de inicialização local:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\start_bms_simulation.ps1
+```
+
+Esse fluxo abre simultaneamente:
+- o BMS em ambiente native (`.\.pio\build\native\program.exe`)
+- o dashboard em `web\index.html`
+
+Se quiser rodar apenas o firmware em console, use:
+
+```powershell
+.\.pio\build\native\program.exe
+```
+
+Saída esperada do sistema em simulação (exemplo real observado):
+
+```text
+[HEARTBEAT] ALIVE=YES STATE=READY UPTIME=14063 ms SOC=100% TEMP=25.0 C
+
+=============== BMS INDUSTRIAL ===============
+STATE MACHINE : READY
+STATE         : FAULT
+FAULT CODE   : 0x0101
+FAULT NAME   : CELL_OVERVOLTAGE
+SOURCE CELL  : 1
+MEASURED     : 4.300 V
+LIMIT        : 4.200 V
+
+ACTION
+ CHARGE MOSFET      OFF
+ DISCHARGE MOSFET   ON
+ BALANCE            OFF
+==============================================
+```
+
+Esse comportamento indica que a simulação está rodando e o firmware está monitorando falhas do pack em tempo real.
+
 ### Executar os testes
 
 ```powershell
