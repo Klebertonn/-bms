@@ -1,8 +1,26 @@
 #include "watchdog_manager.h"
 
-void WatchdogManager::init() {}
+#include "../clock/clock.h"
 
-void WatchdogManager::heartbeat(unsigned /*taskIndex*/) {}
+void WatchdogManager::init()
+{
+	lastHeartbeatMs_ = Clock::millis();
+	missedHeartbeats_ = 0;
+	healthy_ = false;
+}
 
-void WatchdogManager::update() {}
+void WatchdogManager::heartbeat(unsigned /*taskIndex*/)
+{
+	lastHeartbeatMs_ = Clock::millis();
+	healthy_ = true;
+}
+
+void WatchdogManager::update()
+{
+	if (Clock::millis() - lastHeartbeatMs_ > timeoutMs_)
+	{
+		healthy_ = false;
+		++missedHeartbeats_;
+	}
+}
 

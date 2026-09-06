@@ -138,6 +138,22 @@ void App::setMosfetDriver(IMosfetDriver* driver)
     }
 }
 
+AppDiagnostics App::diagnostics() const
+{
+    AppDiagnostics snapshot;
+    snapshot.pack = battery_.getPack();
+    snapshot.state = stateManager_.toString();
+    snapshot.activeFaults = fault_.getActiveFaults();
+    snapshot.faultsRaised = faultsRaised_;
+    snapshot.faultsCleared = faultsCleared_;
+    snapshot.heartbeat = heartbeat_.data();
+    snapshot.storageErrors = storageErrors_;
+    snapshot.selfTestPassed = bmsStateMachine_.selfTestPassed();
+    snapshot.watchdogHealthy = watchdog_.isHealthy();
+    snapshot.watchdogMisses = watchdog_.missedHeartbeats();
+    return snapshot;
+}
+
 bool App::init()
 {
     fault_.init();
@@ -147,7 +163,10 @@ bool App::init()
 
     printf("Loading Fault History...\n");
 
-    faultStorage_.init();
+    if (!faultStorage_.init())
+    {
+        ++storageErrors_;
+    }
 
     constexpr bool CLEAR_FAULT_HISTORY_ON_BOOT = false;
     if (CLEAR_FAULT_HISTORY_ON_BOOT)
@@ -156,7 +175,10 @@ bool App::init()
     }
 
     std::vector<FaultInfo> persistedHistory;
-    faultStorage_.load(persistedHistory);
+    if (!faultStorage_.load(persistedHistory))
+    {
+        ++storageErrors_;
+    }
 
     for (const auto& fault : persistedHistory)
     {
@@ -191,6 +213,7 @@ bool App::init()
 
     // Sprint Heartbeat — inicializa o heartbeat do firmware.
     heartbeat_.init();
+    watchdog_.init();
 
     return true;
 }
@@ -221,6 +244,7 @@ void App::printFaultHistory()
 
 void App::update()
 {
+    watchdog_.update();
     // Contadores para status periódico (5 s)
     static std::uint64_t lastStatusMs = 0;
     static std::uint64_t loopCount = 0;
@@ -302,7 +326,7 @@ void App::update()
         printf("=============== BMS STATUS ===============\n");
         printf("UPTIME       : %llu ms\n", static_cast<unsigned long long>(nowMs));
         printf("LOOPS        : %llu\n", static_cast<unsigned long long>(loopCount));
-        printf("STATE        : %s\n", bmsStateMachine_.toString());
+        printf("STATE        : %s\n", stateManager_.toString());
         printf("PACK VOLTAGE : %.2f V\n", pack.totalVoltage);
         printf("MIN CELL     : %.3f V\n", pack.minVoltage);
         printf("MAX CELL     : %.3f V\n", pack.maxVoltage);
@@ -339,11 +363,11 @@ void App::update()
     // Edge detection DTC -> FaultHistory + FaultStorage
     //-------------------------------------------------
 
-    static std::size_t lastActiveCount = 0;
     const std::size_t activeCount = fault_.getActiveFaults();
 
-    if (activeCount > lastActiveCount)
+    if (activeCount > previousActiveFaults_)
     {
+        faultsRaised_ += activeCount - previousActiveFaults_;
         // Nova falha detectada — pega o primeiro evento ativo
         FaultEvent ev;
         if (fault_.getActiveFault(0, ev))
@@ -376,8 +400,11 @@ void App::update()
             if (!alreadyExists)
             {
                 faultHistory_.push(snapshot);
-                faultStorage_.append(snapshot);
-                printf("[STORAGE] Fault persisted.\n");
+                if (!faultStorage_.append(snapshot))
+                {
+                    ++storageErrors_;
+                }
+                printf("[STORAGE] Fault persistence attempted.\n");
             }
 
             lastFaultActive_ = true;
@@ -386,8 +413,9 @@ void App::update()
             lastFaultSource_ = ev.source;
         }
     }
-    else if (activeCount == 0 && lastActiveCount > 0)
+    else if (activeCount < previousActiveFaults_)
     {
+        faultsCleared_ += previousActiveFaults_ - activeCount;
         // Todas as falhas foram limpas
         lastFaultActive_ = false;
         lastFaultReason_ = FaultReason::NONE;
@@ -395,7 +423,7 @@ void App::update()
         lastFaultSource_ = 0xFF;
     }
 
-    lastActiveCount = activeCount;
+    previousActiveFaults_ = activeCount;
 
     //-------------------------------------------------
     // BMS INDUSTRIAL (exibição quando há falha ativa)
@@ -484,9 +512,10 @@ void App::update()
     // Heartbeat
     //-------------------------------------------------
 
-    heartbeat_.setState(bmsStateMachine_.toString());
+    heartbeat_.setState(stateManager_.toString());
     heartbeat_.setSOC(pack.soc);
     heartbeat_.setTemperature(pack.averageTemperature);
 
     heartbeat_.update();
+    watchdog_.heartbeat();
 }

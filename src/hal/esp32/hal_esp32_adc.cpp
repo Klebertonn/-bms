@@ -21,10 +21,11 @@ public:
     Esp32ADC()
     {
         // Configura ADC1 (atenuação típica 11dB → 0..3.3V aprox.)
-        for (std::uint8_t ch = 0; ch < PACK_CELL_COUNT; ++ch)
+        for (std::uint8_t index = 0; index < PACK_CELL_COUNT; ++index)
         {
             adc1_config_width(ADC_WIDTH_BIT_12);
-            adc1_config_channel_atten(static_cast<adc1_channel_t>(ch), ADC_ATTEN_DB_11);
+            adc1_config_channel_atten(
+                static_cast<adc1_channel_t>(HW_CELL_ADC_CHANNELS[index]), ADC_ATTEN_DB_12);
         }
     }
 
@@ -35,7 +36,8 @@ public:
             return 0.0f;
         }
 
-        const int raw = adc1_get_raw(static_cast<adc1_channel_t>(index));
+        const int raw = adc1_get_raw(
+            static_cast<adc1_channel_t>(HW_CELL_ADC_CHANNELS[index]));
 
         // Converte ADC (12 bits, 0..4095) p/ 0..3.3V
         float voltage = (raw / 4095.0f) * 3.3f;

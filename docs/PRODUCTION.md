@@ -9,8 +9,8 @@ Este documento é o **checklist de aceitação industrial** para liberação do 
 
 ## 1. Build e Compilação
 
-- [ ] `pio run -e native` compila sem erros.
-- [ ] `pio run -e esp32dev` compila sem erros (se plataforma disponível).
+- [x] `pio run -e native` compila sem erros (validado em 2026-09-04).
+- [x] `pio run -e esp32dev` compila sem erros (validado em 2026-09-04).
 - [ ] Sem *warnings* críticos (overflow, uninitialized, etc.).
 - [ ] Build reproduzível (mesma versão de toolchain).
 
@@ -69,8 +69,9 @@ Este documento é o **checklist de aceitação industrial** para liberação do 
 
 ## 9. Watchdog e Confiabilidade
 
-- [ ] Watchdog de software ativo.
+- [x] Watchdog de software ativo, com timeout de 500 ms e heartbeat por ciclo.
 - [ ] Watchdog de hardware (quando disponível).
+- [x] Falha crítica → `FAULT`.
 - [ ] Reinício seguro registra causa.
 
 ## 10. Segurança Funcional
@@ -81,9 +82,10 @@ Este documento é o **checklist de aceitação industrial** para liberação do 
 
 ## 11. Testes
 
-- [ ] Testes unitários passam.
-- [ ] Testes de integração passam.
-- [ ] Relatório de testes gerado (`test/generate_report.py`).
+- [x] Testes unitários passam: 41/41 casos no ambiente native (2026-09-04).
+- [x] Testes de integração passam: suíte `native/test_app` aprovada.
+- [x] Endurance native aprovado: 5 min, 30 min e 1 h, sem exceções ou erros de storage.
+- [x] Relatório de testes gerado (`scripts/generate_report.py` → `scripts/report/index.html`).
 
 ## 12. Documentação
 
@@ -101,6 +103,8 @@ Este documento é o **checklist de aceitação industrial** para liberação do 
 - [ ] Estrutura de pastas organizada.
 - [ ] Tag de release (`v1.0.0`).
 
+Relatório consolidado: [`reports/validation_report_2026-09-04.md`](../reports/validation_report_2026-09-04.md).
+
 ---
 
 ## Critérios de Bloqueio (Gate)
@@ -117,4 +121,4 @@ Para considerar o firmware **pronto para produção**, os itens marcados como **
 
 | Data | Versão | Aprovado por | Status |
 |------|--------|--------------|--------|
-| 2026-07-03 | 1.0.0 | — | Pendente |
+| 2026-09-04 | 1.0.0 | — | Gates native/ESP32 aprovados; validação em hardware pendente |

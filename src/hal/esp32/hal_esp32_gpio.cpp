@@ -28,7 +28,7 @@ public:
     {
     }
 
-    void init() const
+    void init()
     {
         pinMode(pin_, OUTPUT);
         off();

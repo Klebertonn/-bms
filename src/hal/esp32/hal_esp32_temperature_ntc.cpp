@@ -23,7 +23,7 @@ public:
     NtcTemperatureSensor()
     {
         adc1_config_width(ADC_WIDTH_BIT_12);
-        adc1_config_channel_atten(static_cast<adc1_channel_t>(HW_NTC_ADC_CHANNEL), ADC_ATTEN_DB_11);
+        adc1_config_channel_atten(static_cast<adc1_channel_t>(HW_NTC_ADC_CHANNEL), ADC_ATTEN_DB_12);
     }
 
     float readTemperature(int sensor) override

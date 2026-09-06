@@ -19,14 +19,14 @@ class Ina219CurrentSensor : public ICurrentSensor
 {
 public:
     Ina219CurrentSensor()
-        : ina_()
+        : ina_(HW_INA219_I2C_ADDR)
     {
     }
 
 bool begin() override
     {
         Wire.begin(HW_I2C_SDA_PIN, HW_I2C_SCL_PIN);
-        return ina_.begin(HW_INA219_I2C_ADDR);
+            return ina_.begin(&Wire);
     }
 
     float readCurrentA() override

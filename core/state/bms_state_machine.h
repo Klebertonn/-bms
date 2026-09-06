@@ -34,6 +34,8 @@ public:
 
     BmsIndustrialState state() const;
 
+    bool selfTestPassed() const { return selfTest_.passed(); }
+
     BmsIndustrialState previousState() const { return previousState_; }
 
     const char* toString() const;

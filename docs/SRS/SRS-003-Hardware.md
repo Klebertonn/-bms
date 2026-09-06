@@ -2,7 +2,7 @@
 
 **Projeto:** BMS Firmware
 **Versão:** 1.0.0
-**Status:** Em desenvolvimento
+**Status:** Prototipo 3S especificado; PCB propria em fase de arquitetura
 **Dependências:** SRS-001 – Visão Geral, SRS-002 – Arquitetura
 
 ---
@@ -72,6 +72,11 @@ Objetivo:
 ---
 
 # 4. Sensores Suportados
+
+> Para o prototipo 3S, o ADC interno com divisor e somente uma etapa de
+> bancada. A protecao primaria e a medicao de producao devem usar AFE BMS
+> dedicado. Consulte `docs/HARDWARE_3S_ESP32_PROTOTYPE.md` e
+> `docs/BMS_OWN_PCB_ROADMAP.md`.
 
 ## Tensão das células
 

@@ -58,6 +58,7 @@ PRODUCTION_DIRS = [
     "system",
     "communication",
     "lib",
+    "src/app",
 ]
 
 # ---------------------------------------------------------------
@@ -84,6 +85,10 @@ env.AppendUnique(
         join(project_dir, "config"),
     ]
 )
+
+# O executor endurance é usado pelo entrypoint native e não possui main próprio.
+# Adiciona sua implementação diretamente para manter o link determinístico.
+_build_dirs(["tools/bms_endurance"])
 
 # Se estamos num build de teste (env de teste define BUILD_TEST_DIR),
 # adiciona as fontes de produção. O normal `pio run` não é afetado.

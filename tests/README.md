@@ -2,8 +2,10 @@
 
 Testes unitários, de integração e de sistema do BMS.
 
-> **Nota:** esta pasta foi renomeada de `test/` para `tests/` na reorganização do
-> repositório. O `platformio.ini` foi atualizado com `test_dir = tests`.
+> **Nota:** esta pasta contém os testes legados da reorganização. O PlatformIO
+> usa o diretório padrão `test/` e executa atualmente as suítes ativas em
+> `test/native/`; estes arquivos só devem voltar ao gate quando forem
+> convertidos para suítes compatíveis com o runner.
 
 ## Framework
 - **Unity** (via PlatformIO) — `test_framework = unity` em `platformio.ini`.

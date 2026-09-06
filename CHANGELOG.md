@@ -6,6 +6,24 @@ O formato segue [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/) e o 
 
 ---
 
+## [Unreleased] - 2026-09-04
+
+### Corrigido
+- Corrigido o filtro de fontes e o link das bibliotecas locais no alvo ESP32.
+- Corrigidas incompatibilidades dos drivers GPIO, INA219, CAN e BLE com o toolchain instalado.
+- Adicionado teste de integração do ciclo `App::init()` + `App::update()`.
+- Registrado o baseline nativo de 35/35 testes aprovados.
+- Adicionados 6 cenários de fault injection para proteção, recuperação e MOSFETs.
+- Implementado executor endurance nativo com métricas e relatório.
+- Adicionada telemetria endurance periódica com dados reais do pack e da aplicação.
+- Registrados ensaios endurance aprovados de 5 e 30 minutos.
+- Registrado ensaio endurance aprovado de 1 hora.
+- Melhorada a medição de latência do loop para resolução de microssegundos.
+- Corrigida a telemetria para refletir o estado operacional `FAULT`.
+- Implementado watchdog de software com timeout e diagnóstico de perdas.
+- Ativado o Task Watchdog Timer do ESP32 e o registro da causa de reset.
+- Adicionado relatório consolidado de validação e riscos de liberação.
+
 ## [1.0.0] - 2026-07-03
 
 ### Adicionado

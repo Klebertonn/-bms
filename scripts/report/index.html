@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BMS — Relatório de Testes</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        background: #0f172a; color: #e2e8f0;
+        padding: 2rem; line-height: 1.5;
+    }
+    .container { max-width: 900px; margin: 0 auto; }
+    h1 { margin-bottom: 0.5rem; }
+    .meta { color: #94a3b8; margin-bottom: 2rem; }
+    .summary {
+        display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;
+    }
+    .summary-box {
+        background: #1e293b; border-radius: 12px; padding: 1.25rem;
+        flex: 1; min-width: 140px; text-align: center;
+    }
+    .summary-box .num { font-size: 2rem; font-weight: 700; }
+    .summary-box .lbl { color: #94a3b8; font-size: 0.85rem; }
+    table {
+        width: 100%; border-collapse: collapse; background: #1e293b;
+        border-radius: 12px; overflow: hidden;
+    }
+    th, td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid #334155; }
+    th { color: #94a3b8; text-transform: uppercase; font-size: 0.8rem; }
+    .badge { padding: 0.25rem 0.75rem; border-radius: 999px; font-weight: 700; font-size: 0.8rem; }
+    .badge--pass { background: #34d399; color: #0f172a; }
+    .badge--fail { background: #f87171; color: #0f172a; }
+    .badge--pending { background: #94a3b8; color: #0f172a; }
+    .footer { margin-top: 2rem; color: #94a3b8; font-size: 0.85rem; }
+    @media (max-width: 600px) {
+        body { padding: 1rem; }
+        .summary { flex-direction: column; }
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>⚡ BMS — Relatório de Testes</h1>
+    <p class="meta">Gerado em 2026-09-04 23:24:46</p>
+
+    <div class="summary">
+        <div class="summary-box"><div class="num">0</div><div class="lbl">Testes</div></div>
+        <div class="summary-box" style="color:#34d399"><div class="num">0</div><div class="lbl">Passaram</div></div>
+        <div class="summary-box" style="color:#f87171"><div class="num">0</div><div class="lbl">Falharam</div></div>
+        <div class="summary-box"><div class="num">0.0%</div><div class="lbl">Aprovação</div></div>
+    </div>
+
+    <table>
+        <thead>
+            <tr><th>Suíte</th><th>Status</th><th>Total</th><th>PASS</th><th>FAIL</th><th>Ignorados</th></tr>
+        </thead>
+        <tbody>
+            
+                <tr>
+                    <td>test_unit_fault</td>
+                    <td><span class="badge badge--pending">NÃO EXECUTADO</span></td>
+                    <td>—</td><td>—</td><td>—</td><td>—</td>
+                </tr>
+                <tr>
+                    <td>test_unit_storage</td>
+                    <td><span class="badge badge--pending">NÃO EXECUTADO</span></td>
+                    <td>—</td><td>—</td><td>—</td><td>—</td>
+                </tr>
+                <tr>
+                    <td>test_unit_scheduler</td>
+                    <td><span class="badge badge--pending">NÃO EXECUTADO</span></td>
+                    <td>—</td><td>—</td><td>—</td><td>—</td>
+                </tr>
+                <tr>
+                    <td>test_unit_state_machine</td>
+                    <td><span class="badge badge--pending">NÃO EXECUTADO</span></td>
+                    <td>—</td><td>—</td><td>—</td><td>—</td>
+                </tr>
+                <tr>
+                    <td>test_unit_can</td>
+                    <td><span class="badge badge--pending">NÃO EXECUTADO</span></td>
+                    <td>—</td><td>—</td><td>—</td><td>—</td>
+                </tr>
+                <tr>
+                    <td>test_unit_ble</td>
+                    <td><span class="badge badge--pending">NÃO EXECUTADO</span></td>
+                    <td>—</td><td>—</td><td>—</td><td>—</td>
+                </tr>
+                <tr>
+                    <td>test_unit_eeprom_flash</td>
+                    <td><span class="badge badge--pending">NÃO EXECUTADO</span></td>
+                    <td>—</td><td>—</td><td>—</td><td>—</td>
+                </tr>
+                <tr>
+                    <td>test_unit_self_test</td>
+                    <td><span class="badge badge--pending">NÃO EXECUTADO</span></td>
+                    <td>—</td><td>—</td><td>—</td><td>—</td>
+                </tr>
+                <tr>
+                    <td>test_integration</td>
+                    <td><span class="badge badge--pending">NÃO EXECUTADO</span></td>
+                    <td>—</td><td>—</td><td>—</td><td>—</td>
+                </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        Resultado geral: <span class="badge badge--fail">FAIL</span>
+        — Plataforma native (PlatformIO Test).
+    </div>
+</div>
+</body>
+</html>

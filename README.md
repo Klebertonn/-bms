@@ -95,6 +95,16 @@ Compila para o ESP32. Requer a plataforma `espressif32` instalada.
 pio run -e esp32dev -t upload && pio device monitor
 ```
 
+### Endurance (Native)
+
+```bash
+pio run -e native
+.pio/build/native/program.exe --endurance --duration-ms 300000
+```
+
+Use `--duration-ms 0` (ou omita a duração) para manter a execução até `Ctrl+C`.
+O relatório é salvo em `reports/endurance_latest.txt`.
+
 ---
 
 ## Testes
@@ -140,6 +150,15 @@ As constantes de configuração (limites de tensão, corrente, temperatura, pino
 - [Requisitos (SRS)](docs/SRS/)
 - [Design (DDS)](docs/DDS/)
 - [Interfaces (ICD)](docs/ICD/)
+- [Especificacao eletrica 3S / ESP32 DevKit](docs/HARDWARE_3S_ESP32_PROTOTYPE.md)
+- [BOM de bancada 3S](docs/BOM_3S_BENCH.md)
+- [BOM detalhada com modelos e marcas](docs/BOM_3S_BENCH_DETAILED.md)
+- [Lista de compra completa da bancada](docs/LISTA_COMPRA_BANCADA_3S.md)
+- [Plano de teste de bancada](docs/BENCH_TEST_PLAN_3S.md)
+- [Roadmap da PCB BMS propria](docs/BMS_OWN_PCB_ROADMAP.md)
+- [Desenho da bancada 3S + ESP32 DevKit](docs/DIAGRAM_BANCADA_3S_ESP32.md)
+- [Desenho da futura PCB BMS 3S](docs/DIAGRAM_PCB_BMS_3S.md)
+- [Netlist de montagem da bancada](docs/NETLIST_3S_BENCH.md)
 
 ---
 

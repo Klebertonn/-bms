@@ -37,8 +37,8 @@ pio test -e native
 
 O ultimo resultado validado foi:
 
-- 34 casos de teste executados
-- 34 casos aprovados
+- 41 casos de teste executados
+- 41 casos aprovados
 - 0 falhas
 
 ## 3. Abrir o dashboard local
@@ -130,9 +130,11 @@ A ordem recomendada e:
 ## 8. Seguranca eletrica obrigatoria
 
 - Nunca conecte uma celula de litio diretamente a um GPIO do ESP32.
-- O ADC atual usa leitura direta e esta com `SCALE_FACTOR = 1.0f`.
-- Uma celula de 4,2 V pode exceder a faixa segura do ADC, dependendo do circuito e da atenuacao.
-- Use divisor de tensao ou circuito dedicado de monitoramento, dimensionado e medido com multimetro.
+- O ADC do prototipo deve usar os divisores e protecoes definidos em
+	[`HARDWARE_3S_ESP32_PROTOTYPE.md`](HARDWARE_3S_ESP32_PROTOTYPE.md); nunca ligar
+	taps diretamente ao ESP32.
+- Para pack em serie, prefira AFE dedicado; divisor no ADC e apenas medicao
+	experimental supervisionada e precisa de calibracao.
 - Use fusivel, limitacao de corrente, cabos adequados e suporte para a celula.
 - Nao carregue uma celula sem carregador apropriado e supervisao.
 - Nao deixe a bancada ligada sem supervisao.

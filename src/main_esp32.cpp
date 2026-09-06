@@ -14,6 +14,8 @@
  */
 
 #include <Arduino.h>
+#include <esp_system.h>
+#include <esp_task_wdt.h>
 
 #include "app/app.h"
 
@@ -68,11 +70,35 @@ static std::uint32_t lastLoopMs = 0;
 static std::uint32_t lastCanMs = 0;
 static std::uint32_t lastDisplayMs = 0;
 
+static const char* resetReasonToString(esp_reset_reason_t reason)
+{
+    switch (reason)
+    {
+        case ESP_RST_POWERON: return "POWERON";
+        case ESP_RST_EXT: return "EXTERNAL";
+        case ESP_RST_SW: return "SOFTWARE";
+        case ESP_RST_PANIC: return "PANIC";
+        case ESP_RST_INT_WDT: return "INT_WATCHDOG";
+        case ESP_RST_TASK_WDT: return "TASK_WATCHDOG";
+        case ESP_RST_WDT: return "WATCHDOG";
+        case ESP_RST_DEEPSLEEP: return "DEEPSLEEP";
+        case ESP_RST_BROWNOUT: return "BROWNOUT";
+        case ESP_RST_SDIO: return "SDIO";
+        default: return "UNKNOWN";
+    }
+}
+
 void setup()
 {
     Serial.begin(115200);
     delay(200);
     Serial.println("[BMS] ESP32 boot...");
+    Serial.print("[HW] RESET REASON: ");
+    Serial.println(resetReasonToString(esp_reset_reason()));
+
+    // Watchdog de hardware: reinicia o ESP32 se o loop travar por 2 s.
+    esp_task_wdt_init(2, true);
+    esp_task_wdt_add(nullptr);
 
     // -----------------------------------------------------------------
     // 1. Inicialização de hardware (HAL real)
@@ -163,6 +189,7 @@ void loop()
     // 1. Lógica BMS (telemetria, proteções, estado, MOSFETs)
     // -----------------------------------------------------------------
     app.update();
+    esp_task_wdt_reset();
 
     // -----------------------------------------------------------------
     // 2. CAN — envio periódico de telemetria
@@ -188,7 +215,11 @@ void loop()
     }
 
     // Recebe frames (diagnóstico/CLI)
-    can.receive();
+    CANFrame receivedFrame;
+    while (can.available() && can.receive(receivedFrame))
+    {
+        // O processamento de comandos será conectado ao protocolo CAN.
+    }
 
     // -----------------------------------------------------------------
     // 3. BLE — poll dos serviços GATT

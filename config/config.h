@@ -113,7 +113,10 @@ constexpr std::uint8_t   HW_RELAY_PIN         = 32;
 constexpr std::uint8_t   HW_CAN_TX_PIN        = 5;
 constexpr std::uint8_t   HW_CAN_RX_PIN        = 4;
 
-constexpr std::uint8_t   HW_NTC_ADC_CHANNEL   = 0;   // ADC1_CH0 (GPIO 36)
+// Usa somente entradas ADC1 normalmente expostas na ESP32 DevKit WROOM.
+// CELL1=GPIO36, CELL2=GPIO34, CELL3=GPIO35; NTC=GPIO39.
+constexpr std::uint8_t   HW_CELL_ADC_CHANNELS[PACK_CELL_COUNT] = {0, 6, 7};
+constexpr std::uint8_t   HW_NTC_ADC_CHANNEL   = 3;   // ADC1_CH3 (GPIO 39)
 
 constexpr std::uint8_t   HW_CAN_TX_GPIO       = HW_CAN_TX_PIN;
 constexpr std::uint8_t   HW_CAN_RX_GPIO       = HW_CAN_RX_PIN;

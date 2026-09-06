@@ -45,7 +45,7 @@ enum BLECharProperty : uint8_t
 constexpr std::uint8_t BLE_CHAR_MAX_LEN = 64;
 
 // Descrição de uma característica
-struct BLECharacteristic
+struct BmsBLECharacteristic
 {
     const char* name = nullptr;          // nome descritivo
     std::uint16_t uuid = 0;              // UUID 16-bit
@@ -55,12 +55,12 @@ struct BLECharacteristic
 };
 
 // Serviço GATT com um conjunto de características
-struct BLEService
+struct BmsBLEService
 {
     const char* name = nullptr;          // nome do serviço
     std::uint16_t uuid = 0;              // UUID 16-bit
     std::uint8_t characteristicCount = 0;
-    BLECharacteristic* characteristics = nullptr; // array de características
+    BmsBLECharacteristic* characteristics = nullptr; // array de características
 };
 
 /*
@@ -82,10 +82,10 @@ public:
     void poll();
 
     // Retorna um serviço pelo seu id (ou nullptr se não existir).
-    BLEService* getService(BLEServiceId id);
+    BmsBLEService* getService(BLEServiceId id);
 
     // Retorna a característica de um serviço pelo índice.
-    BLECharacteristic* getCharacteristic(BLEServiceId service, std::uint8_t index);
+    BmsBLECharacteristic* getCharacteristic(BLEServiceId service, std::uint8_t index);
 
     // Atualiza o payload de uma característica (copia dados).
     bool setCharacteristicData(BLEServiceId service, std::uint8_t index,
@@ -96,13 +96,13 @@ private:
     void createServices();
 
     // Arrays de características (um por serviço)
-    BLECharacteristic batteryChars_[2];
-    BLECharacteristic faultChars_[1];
-    BLECharacteristic tempChars_[1];
-    BLECharacteristic currentChars_[1];
-    BLECharacteristic configChars_[1];
-    BLECharacteristic logChars_[1];
+    BmsBLECharacteristic batteryChars_[2];
+    BmsBLECharacteristic faultChars_[1];
+    BmsBLECharacteristic tempChars_[1];
+    BmsBLECharacteristic currentChars_[1];
+    BmsBLECharacteristic configChars_[1];
+    BmsBLECharacteristic logChars_[1];
 
     // Serviços
-    BLEService services_[static_cast<int>(BLEServiceId::COUNT)];
+    BmsBLEService services_[static_cast<int>(BLEServiceId::COUNT)];
 };

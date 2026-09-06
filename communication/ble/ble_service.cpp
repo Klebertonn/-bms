@@ -134,7 +134,7 @@ void BLEServiceManager::poll()
     // a leitura é feita diretamente pelo buffer de cada característica.
 }
 
-BLEService* BLEServiceManager::getService(BLEServiceId id)
+BmsBLEService* BLEServiceManager::getService(BLEServiceId id)
 {
     const int idx = static_cast<int>(id);
     if (idx < 0 || idx >= static_cast<int>(BLEServiceId::COUNT))
@@ -144,9 +144,9 @@ BLEService* BLEServiceManager::getService(BLEServiceId id)
     return &services_[idx];
 }
 
-BLECharacteristic* BLEServiceManager::getCharacteristic(BLEServiceId service, std::uint8_t index)
+BmsBLECharacteristic* BLEServiceManager::getCharacteristic(BLEServiceId service, std::uint8_t index)
 {
-    BLEService* svc = getService(service);
+    BmsBLEService* svc = getService(service);
     if (svc == nullptr || index >= svc->characteristicCount)
     {
         return nullptr;
@@ -157,7 +157,7 @@ BLECharacteristic* BLEServiceManager::getCharacteristic(BLEServiceId service, st
 bool BLEServiceManager::setCharacteristicData(BLEServiceId service, std::uint8_t index,
                                               const std::uint8_t* data, std::uint8_t len)
 {
-    BLECharacteristic* ch = getCharacteristic(service, index);
+    BmsBLECharacteristic* ch = getCharacteristic(service, index);
     if (ch == nullptr || data == nullptr)
     {
         return false;

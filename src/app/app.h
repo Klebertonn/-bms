@@ -16,9 +16,24 @@
 #include "../../system/logger/logger.h"
 #include "../../system/storage/fault_storage.h"
 #include "../../system/heartbeat/heartbeat_manager.h"
+#include "../../system/rtos/watchdog_manager.h"
 
 #include "../../lib/hal/gpio/mosfet_driver_interface.h"
 #include "../hal/gpio/mock_mosfet_driver.h"
+
+struct AppDiagnostics
+{
+    BatteryPack pack{};
+    const char* state = "UNKNOWN";
+    std::size_t activeFaults = 0;
+    std::uint64_t faultsRaised = 0;
+    std::uint64_t faultsCleared = 0;
+    HeartbeatData heartbeat{};
+    std::uint64_t storageErrors = 0;
+    bool selfTestPassed = false;
+    bool watchdogHealthy = false;
+    std::uint32_t watchdogMisses = 0;
+};
 
 /*
  * ==========================================================
@@ -62,6 +77,7 @@ class App
 public:
     bool init();
     void update();
+    AppDiagnostics diagnostics() const;
 
     // Injeção de dependência: permite substituir o driver de MOSFET
     // (mock no native, HalMosfetController no esp32dev).
@@ -91,6 +107,7 @@ private:
     FaultHistory faultHistory_{};
     FaultStorage faultStorage_{};
     HeartbeatManager heartbeat_{};
+    WatchdogManager watchdog_{};
 
     // Adaptadores de saída (Dependency Injection) do FaultManager.
     FaultLogSinkAdapter faultLogSink_{};
@@ -101,4 +118,8 @@ private:
     FaultReason lastFaultReason_ = FaultReason::NONE;
     std::uint16_t lastFaultCode_ = 0;
     std::uint8_t lastFaultSource_ = 0xFF;
+    std::uint64_t storageErrors_ = 0;
+    std::uint64_t faultsRaised_ = 0;
+    std::uint64_t faultsCleared_ = 0;
+    std::size_t previousActiveFaults_ = 0;
 };

@@ -1,0 +1,25 @@
+BMS ENDURANCE REPORT
+Test: native endurance 1 hour
+Start ms: 0
+End ms: 3600015
+Duration ms: 3600015
+Loops: 32383
+Loop average us: 960
+Loop max us: 55531
+Exceptions: 0
+State: READY
+Pack voltage: 12.67
+Min cell voltage: 4.18
+Max cell voltage: 4.3
+Current A: 2.35
+Temperature C: 25
+SOC: 100
+SOH: 100
+Active DTC: 1
+DTC raised: 1
+DTC cleared: 0
+Heartbeat alive: true
+Heartbeat errors: 0
+Self test failures: 0
+Storage errors: 0
+Result: PASS
